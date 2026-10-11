@@ -71,6 +71,41 @@ describe("revocation", () => {
   });
 });
 
+describe("forced transfer", () => {
+  const order = { reason: "lost-key", orderedBy: "Compliance committee, case 2026-014" };
+
+  test("the compliance authority can move units without the holder's signature", async () => {
+    const { world, amira, lukas } = await seriesWithInvestors(60n);
+    await world.forcedTransfer(amira, lukas, 60n, order);
+    expect(await world.units(amira)).toBe(0n);
+    expect(await world.units(lukas)).toBe(60n);
+  });
+
+  test("no other key can, including the issuer", async () => {
+    const { world, amira, lukas } = await seriesWithInvestors(60n);
+    await expect(world.forcedTransfer(amira, lukas, 1n, order, world.issuer)).rejects.toThrow();
+    await expect(world.forcedTransfer(amira, lukas, 1n, order, lukas)).rejects.toThrow();
+    expect(await world.units(amira)).toBe(60n);
+  });
+
+  test("it is still bound by the transfer hook", async () => {
+    const { world, amira } = await seriesWithInvestors(60n);
+    const unregistered = world.investor();
+    world.thawOnly(unregistered);
+    await expect(world.forcedTransfer(amira, unregistered, 1n, order)).rejects.toThrow(/AccountNotInitialized/);
+  });
+
+  test("it is refused without a reason and an ordering authority", async () => {
+    const { world, amira, lukas } = await seriesWithInvestors(60n);
+    await expect(world.forcedTransfer(amira, lukas, 1n, { reason: " ", orderedBy: "x" })).rejects.toThrow(
+      /needs a reason/,
+    );
+    await expect(world.forcedTransfer(amira, lukas, 1n, { reason: "lost-key", orderedBy: "" })).rejects.toThrow(
+      /needs a reason/,
+    );
+  });
+});
+
 describe("known gap, tracked in issue #21", () => {
   test("minting does not run the hook, so a primary subscription can exceed the cap", async () => {
     const { world, lukas } = await seriesWithInvestors();

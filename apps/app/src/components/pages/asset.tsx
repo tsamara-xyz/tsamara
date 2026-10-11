@@ -36,6 +36,8 @@ export function AssetPage() {
     ["Investors", String(investorCount(holders))],
     ["Holding cap", `${t.maxHolding} units`],
     ["Not offered in", t.restrictedJurisdictions.join(", ") || "none"],
+    ["Tangible assets", `${rate(t.tangibleAssetsBps)} as of ${t.tangibilityAsOf}`],
+    ["Transfers", t.tangibleAssetsBps >= 5_100 ? "At agreed prices" : "At par only"],
   ];
   const address = (label: string, value: string) => (
     <div>

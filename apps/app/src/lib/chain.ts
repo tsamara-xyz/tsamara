@@ -19,11 +19,13 @@ export interface Series {
     akad: string;
     maturity: string;
     currency: string;
-    profitRateBps: number;
+    expectedProfitRateBps: number;
     paymentsPerYear: number;
     unitValue: string;
     restrictedJurisdictions: string[];
     maxHolding: string;
+    tangibleAssetsBps: number;
+    tangibilityAsOf: string;
   };
 }
 

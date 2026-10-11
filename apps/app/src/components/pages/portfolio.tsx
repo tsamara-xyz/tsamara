@@ -82,7 +82,7 @@ export function PortfolioPage() {
                 <td className="num">{String(units)}</td>
                 <td className="num">{usd(series.terms.unitValue, decimals)}</td>
                 <td className="num">{usd(value, decimals)}</td>
-                <td className="num up">{rate(series.terms.profitRateBps)}</td>
+                <td className="num up">{rate(series.terms.expectedProfitRateBps)}</td>
                 <td className="num">
                   <Link className="btn small" href={`/assets/${series.terms.symbol.toLowerCase()}`}>
                     Trade

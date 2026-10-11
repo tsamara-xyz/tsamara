@@ -86,6 +86,20 @@ bun run app        # http://localhost:3000
 
 Use the built-in test wallet, or Phantom switched to devnet. Request test dollars, approve your address from the Operator tab with the admin token, then subscribe and transfer.
 
+## Tests
+
+| Layer | What it covers | Run |
+|---|---|---|
+| Program, unit (Rust) | Jurisdiction matching and account sizing | `cargo test --lib` in `contracts/` |
+| Program, integration (LiteSVM) | The compiled program with the TypeScript library, in-process: who may initialize and register, transfers through the hook, the holding cap at its boundary | `bun test contracts` |
+| Program, regression and security | The hook refuses to run outside a transfer, a forged recipient is rejected, revoked investors cannot move units, and the known minting gap is pinned | `bun test contracts` |
+| Library, unit | Distribution math, settlement amounts and token programs, instruction encoding, eligibility | `bun test packages` |
+| Indexer, unit (Rust) | Event classification and exactly-once storage | `cargo test --manifest-path apps/indexer/Cargo.toml` |
+| App, unit and regression | Derived figures, error explanations, request shape (a past CORS bug) | `bun test apps/app` |
+| End to end, devnet | Full lifecycle with assertions; API flow including Sumsub | `bun run demo`, `bun apps/api/smoke.ts` |
+
+`bun test` runs every TypeScript suite and needs no network. The program tests load `contracts/tests/fixtures/tsamara_compliance.so`; run `bun run --cwd contracts build` after changing the program so they do not test a stale binary.
+
 ## Status
 
 This is a prototype. It is not compliance-ready or production-ready, and it does not claim any regulatory approval or sharia certification. [docs/COMPLIANCE.md](docs/COMPLIANCE.md) maps each requirement to its control and honest status. The gaps are tracked as issues labelled [`compliance`](https://github.com/tsamara-xyz/tsamara/labels/compliance) and [`production`](https://github.com/tsamara-xyz/tsamara/labels/production).

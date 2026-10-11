@@ -2,15 +2,17 @@
 
 # Tsamara
 
-Sovereign sukuk for everyone: buy from $10 in USDC, trade any time, receive distributions onchain.
+Tokenized sovereign sukuk in $10 units: subscribe in stablecoins, transfer between approved investors, receive distributions onchain.
 
 > Devnet prototype built for the Colosseum Crypto World's Fair hackathon. The sukuk series is a mock; this is not a real issuance or an offer of securities.
 
 ## Why
 
-Sukuk are the fixed-income instrument of Islamic finance: asset-backed certificates that pay a share of profit instead of interest. Sovereign dollar sukuk are sold to institutions in large minimum denominations and trade over the counter, so most investors who want a sharia-compliant, dollar-denominated, government-backed return cannot buy one directly.
+Sukuk are certificates of ownership in underlying assets: holders receive a share of what the assets earn, not interest on a loan. Sovereign dollar sukuk are sold to institutions in large minimum denominations and trade over the counter, so an investor who wants that exposure in small amounts cannot buy one directly.
 
-Tsamara represents a sukuk series as a token with a small unit size. A KYC'd investor in any jurisdiction where the series is offered can hold a fraction, settle in stablecoins, and sell to another approved investor at any time.
+Tsamara represents a sukuk series as a token with a small unit size. An approved investor in a jurisdiction where the series is offered can hold units, settle in stablecoins, and transfer them to another approved investor.
+
+**What a real version would be.** Tsamara could not issue a sovereign sukuk; it could only hold one in a vehicle and issue units against it. Each unit would have to be a beneficial share in sukuk held on trust, with no affiliation to the sovereign issuer, and a first offering would be limited to eligible investors in one jurisdiction. The $10 unit and broad access are the design target, not something any regime permits an unlicensed issuer today. See [docs/REGULATION.md](docs/REGULATION.md).
 
 ## How it works
 
@@ -102,7 +104,7 @@ Use the built-in test wallet, or Phantom switched to devnet. Request test dollar
 
 ## Status
 
-This is a prototype. It is not compliance-ready or production-ready, and it does not claim any regulatory approval or sharia certification. [docs/COMPLIANCE.md](docs/COMPLIANCE.md) maps each requirement to its control and honest status. The gaps are tracked as issues labelled [`compliance`](https://github.com/tsamara-xyz/tsamara/labels/compliance) and [`production`](https://github.com/tsamara-xyz/tsamara/labels/production).
+This is a prototype. It is not compliance-ready or production-ready, and it does not claim any regulatory approval or sharia certification. [docs/REGULATION.md](docs/REGULATION.md) sets out the legal and sharia position and what we must not claim. [docs/COMPLIANCE.md](docs/COMPLIANCE.md) maps each requirement to its control and honest status. The gaps are tracked as issues labelled [`compliance`](https://github.com/tsamara-xyz/tsamara/labels/compliance) and [`production`](https://github.com/tsamara-xyz/tsamara/labels/production).
 
 ## License
 

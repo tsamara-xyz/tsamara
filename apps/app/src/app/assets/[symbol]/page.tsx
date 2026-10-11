@@ -1,3 +1,3 @@
-import { AssetPage } from "@/components/views";
+import { AssetPage } from "@/components/pages/asset";
 
 export default AssetPage;

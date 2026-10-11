@@ -2,23 +2,29 @@
 export interface SeriesTerms {
   name: string;
   symbol: string;
-  /** Underlying sharia contract, e.g. "Ijarah Asset to be Leased". */
+  /** Underlying sharia contract, e.g. "Wakalah". */
   akad: string;
   /** ISO date. */
   maturity: string;
-  /** Fixed annual imbalan in basis points. */
-  imbalanBps: number;
-  /** Rupiah nominal represented by one token. */
-  unitRupiah: number;
+  /** Denomination, e.g. "USD". */
+  currency: string;
+  /** Fixed annual profit rate in basis points. */
+  profitRateBps: number;
+  /** Periodic distributions per year (2 = semiannual). */
+  paymentsPerYear: number;
+  /** Face value of one token, in base units of the payment token (USDC has 6 decimals). */
+  unitValue: bigint;
 }
 
 export const termsToFields = (t: SeriesTerms): [string, string][] => [
   ["akad", t.akad],
   ["maturity", t.maturity],
-  ["imbalan_bps", String(t.imbalanBps)],
-  ["unit_idr", String(t.unitRupiah)],
+  ["currency", t.currency],
+  ["profit_rate_bps", String(t.profitRateBps)],
+  ["payments_per_year", String(t.paymentsPerYear)],
+  ["unit_value", String(t.unitValue)],
 ];
 
-/** Rupiah owed for one month on `units` tokens, rounded down. */
-export const monthlyImbalan = (units: bigint, t: SeriesTerms): bigint =>
-  (units * BigInt(t.unitRupiah) * BigInt(t.imbalanBps)) / (10_000n * 12n);
+/** Payment-token base units owed for one period on `units` tokens, rounded down. */
+export const periodicDistribution = (units: bigint, t: SeriesTerms): bigint =>
+  (units * t.unitValue * BigInt(t.profitRateBps)) / (10_000n * BigInt(t.paymentsPerYear));

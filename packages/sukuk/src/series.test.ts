@@ -1,26 +1,35 @@
 import { expect, test } from "bun:test";
-import { monthlyImbalan, termsToFields, type SeriesTerms } from "./series";
+import { periodicDistribution, termsToFields, type SeriesTerms } from "./series";
 
+// $10 units, 5.20% p.a., semiannual, paid in a 6-decimal dollar token.
 const terms: SeriesTerms = {
-  name: "Sukuk Negara Ritel Demo 2029",
-  symbol: "SRD29",
-  akad: "Ijarah Asset to be Leased",
-  maturity: "2029-10-10",
-  imbalanBps: 625,
-  unitRupiah: 10_000,
+  name: "Global Sukuk Demo 2031",
+  symbol: "GSD31",
+  akad: "Wakalah",
+  maturity: "2031-10-10",
+  currency: "USD",
+  profitRateBps: 520,
+  paymentsPerYear: 2,
+  unitValue: 10_000_000n,
 };
 
-test("monthly imbalan is pro rata and rounds down", () => {
-  expect(monthlyImbalan(60n, terms)).toBe(3125n);
-  expect(monthlyImbalan(40n, terms)).toBe(2083n); // 2083.33 rounds down
-  expect(monthlyImbalan(0n, terms)).toBe(0n);
+test("periodic distribution is pro rata", () => {
+  expect(periodicDistribution(60n, terms)).toBe(15_600_000n); // $15.60
+  expect(periodicDistribution(40n, terms)).toBe(10_400_000n); // $10.40
+  expect(periodicDistribution(0n, terms)).toBe(0n);
+});
+
+test("periodic distribution rounds down to the base unit", () => {
+  expect(periodicDistribution(1n, { ...terms, unitValue: 100n, profitRateBps: 525 })).toBe(2n); // 2.625
 });
 
 test("terms are serialised as onchain metadata fields", () => {
   expect(Object.fromEntries(termsToFields(terms))).toEqual({
-    akad: "Ijarah Asset to be Leased",
-    maturity: "2029-10-10",
-    imbalan_bps: "625",
-    unit_idr: "10000",
+    akad: "Wakalah",
+    maturity: "2031-10-10",
+    currency: "USD",
+    profit_rate_bps: "520",
+    payments_per_year: "2",
+    unit_value: "10000000",
   });
 });

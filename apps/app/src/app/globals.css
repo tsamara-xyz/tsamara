@@ -593,7 +593,8 @@ code {
 }
 
 .field input,
-.row input {
+.row input,
+.row select {
   padding: 11px 14px;
   border: 1px solid var(--line);
   border-radius: 12px;

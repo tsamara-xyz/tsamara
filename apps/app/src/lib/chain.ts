@@ -76,6 +76,10 @@ export const api = {
       reason?: string;
       signature?: string;
     }>(API, "/kyc/complete", { wallet }),
+  forcedTransfer: (
+    token: string,
+    order: { from: string; to: string; units: number; reason: string; orderedBy: string },
+  ) => request<{ signature: string }>(API, "/admin/forced-transfer", order, token),
   sandboxReview: (token: string, wallet: string) =>
     request<{ reviewAnswer: string }>(API, "/admin/kyc/sandbox-review", { wallet }, token),
   kyc: (token: string, wallet: string, jurisdiction: string) =>

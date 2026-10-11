@@ -46,7 +46,7 @@ export function assetsFor(series: Series): Asset[] {
       name: t.name,
       akad: t.akad,
       maturity: t.maturity,
-      profitRateBps: t.profitRateBps,
+      profitRateBps: t.expectedProfitRateBps,
       paymentsPerYear: t.paymentsPerYear,
       unitValue: BigInt(t.unitValue),
       live: true,

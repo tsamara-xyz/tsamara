@@ -36,6 +36,7 @@ The payment token is configurable (mint, decimals, token program). The demo uses
 contracts            Anchor program: transfer hook, series rules, investor registry
 packages/sukuk       Instruction builders: issuance, KYC, settlement, distribution
 apps/devnet-demo     End-to-end lifecycle on devnet, also the integration check
+apps/indexer         Rust indexer on the Carbon framework: holders and events in SQLite, served over HTTP
 ```
 
 ## Run it
@@ -51,6 +52,16 @@ bun run demo      # full lifecycle on devnet, prints explorer links
 The demo uses the compliance program deployed on devnet at `EjYxuJE4QE8P37scBxgWRHGigZ8hP6j3ysnSQ95MWXXG`. To build it yourself, install the Solana CLI and Anchor, then run `anchor build` in `contracts/`.
 
 The first `bun run demo` prints an issuer address. Fund it with devnet SOL from https://faucet.solana.com and run again.
+
+The indexer requires [Rust](https://rustup.rs) 1.91 or newer. It follows the series from the last `bun run demo`, or the one named by `SUKUK_MINT`, `PAYMENT_MINT` and `ISSUER`.
+
+```sh
+bun run indexer --once   # index what exists, print holders and the event count, exit
+bun run indexer          # keep indexing and serve /series, /holders, /events on PORT (default 8787)
+cargo test --manifest-path apps/indexer/Cargo.toml
+```
+
+It reads from `RPC` (default `https://api.devnet.solana.com`) and stores to `.data/indexer-<SUKUK_MINT>.db`. `GET /events?wallet=<address>` returns one wallet's history.
 
 ## Status
 

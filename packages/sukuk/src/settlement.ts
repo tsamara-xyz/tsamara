@@ -1,9 +1,10 @@
 import {
   createMintToInstruction,
   createTransferCheckedInstruction,
+  createTransferCheckedWithTransferHookInstruction,
   TOKEN_2022_PROGRAM_ID as T22,
 } from "@solana/spl-token";
-import type { PublicKey, TransactionInstruction } from "@solana/web3.js";
+import type { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { ata, type PaymentToken, SUKUK_DECIMALS } from "./mint";
 import type { SeriesTerms } from "./series";
 
@@ -36,26 +37,28 @@ export function subscribeIxs(p: {
   ];
 }
 
+/** Move sukuk units. Resolves the extra accounts the compliance transfer hook needs from the chain. */
+export const transferIx = (conn: Connection, sukukMint: PublicKey, from: PublicKey, to: PublicKey, units: bigint) =>
+  createTransferCheckedWithTransferHookInstruction(
+    conn,
+    ata(sukukMint, from),
+    sukukMint,
+    ata(sukukMint, to),
+    from,
+    units,
+    SUKUK_DECIMALS,
+    [],
+    "confirmed",
+    T22,
+  );
+
 /** Secondary trade between two KYC'd investors. Sign with seller and buyer. */
-export function tradeIxs(p: {
-  sukukMint: PublicKey;
-  payment: PaymentToken;
-  seller: PublicKey;
-  buyer: PublicKey;
-  units: bigint;
-  price: bigint;
-}): TransactionInstruction[] {
+export async function tradeIxs(
+  conn: Connection,
+  p: { sukukMint: PublicKey; payment: PaymentToken; seller: PublicKey; buyer: PublicKey; units: bigint; price: bigint },
+): Promise<TransactionInstruction[]> {
   return [
-    createTransferCheckedInstruction(
-      ata(p.sukukMint, p.seller),
-      p.sukukMint,
-      ata(p.sukukMint, p.buyer),
-      p.seller,
-      p.units,
-      SUKUK_DECIMALS,
-      [],
-      T22,
-    ),
+    await transferIx(conn, p.sukukMint, p.seller, p.buyer, p.units),
     payIx(p.payment, p.buyer, p.seller, p.price),
   ];
 }

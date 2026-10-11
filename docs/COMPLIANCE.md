@@ -23,7 +23,8 @@ This is an engineering document, not legal advice. Tsamara is a devnet prototype
 | Per-investor holding limit on transfers | Transfer hook checks the recipient's balance after the transfer | Onchain |
 | Per-investor holding limit on primary subscription | The API checks the limit before the issuer co-signs; the hook does not run on mint ([#21](https://github.com/tsamara-xyz/tsamara/issues/21)) | Tooling |
 | Offboarding an investor | The compliance authority freezes the account | Onchain |
-| Identity verification and sanctions screening (KYC/AML) | None. The operator enters a wallet and a country code by hand | External |
+| Identity verification (KYC) | Sumsub WebSDK level with identity document and liveness; the API reads the verdict and country server-side and only then registers the investor. Sandbox credentials only, and the country is the document's, not proven residence | Tooling |
+| Sanctions and AML screening | Not configured on the verification level | External |
 | Investor classification (retail, professional, accredited) | Not modelled | Designed |
 
 ## Issuer controls and governance

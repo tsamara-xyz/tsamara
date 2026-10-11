@@ -76,6 +76,8 @@ ADMIN_TOKEN=change-me bun apps/api/smoke.ts       # faucet -> KYC -> subscribe -
 
 Routes under `/admin` (KYC approval, distributions) require the `x-admin-token` header.
 
+KYC runs through [Sumsub](https://sumsub.com) when `SUMSUB_TOKEN` and `SUMSUB_SECRET` (sandbox credentials) are set in `.env`; the API refuses non-sandbox tokens. Without them, the operator approves investors by hand.
+
 With both running, start the web app:
 
 ```sh

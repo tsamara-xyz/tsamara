@@ -13,16 +13,19 @@ describe("initialize_series", () => {
 });
 
 describe("register_investor", () => {
-  test("rejects a restricted jurisdiction", async () => {
+  test("rejects every restricted jurisdiction of the series", async () => {
     const { world } = await seriesWithInvestors();
-    const wallet = world.investor();
-    const ix = registerInvestorIx({
-      payer: world.issuer.publicKey,
-      compliance: world.compliance.publicKey,
-      mint: world.mint.publicKey,
-      investor: { wallet: wallet.publicKey, jurisdiction: "US" },
-    });
-    expect(() => world.send([ix], [world.issuer, world.compliance])).toThrow(/RestrictedJurisdiction/);
+    for (const jurisdiction of terms.restrictedJurisdictions) {
+      const wallet = world.investor();
+      const ix = registerInvestorIx({
+        payer: world.issuer.publicKey,
+        compliance: world.compliance.publicKey,
+        mint: world.mint.publicKey,
+        investor: { wallet: wallet.publicKey, jurisdiction },
+      });
+      expect(() => world.send([ix], [world.issuer, world.compliance])).toThrow(/RestrictedJurisdiction/);
+    }
+    expect(terms.restrictedJurisdictions).toEqual(["US", "ID"]);
   });
 
   test("rejects a signer that is not the compliance authority", async () => {

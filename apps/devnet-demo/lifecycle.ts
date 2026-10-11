@@ -24,12 +24,12 @@ import {
 import {
   approveInvestorIxs,
   ata,
+  DEMO_SERIES,
   distributionIxs,
   initializeComplianceIx,
   issueSeriesIxs,
   type PaymentToken,
   registerInvestorIx,
-  type SeriesTerms,
   subscribeIxs,
   tradeIxs,
   transferIx,
@@ -39,19 +39,7 @@ const conn = new Connection(process.env.RPC ?? "https://api.devnet.solana.com", 
 const USD = 1_000_000n; // one dollar in a 6-decimal token
 const usd = (n: bigint) => `$${(Number(n) / 1e6).toFixed(2)}`;
 
-// Mock series for the demo; not a real issuance.
-const terms: SeriesTerms = {
-  name: "Global Sukuk Demo 2031",
-  symbol: "GSD31",
-  akad: "Wakalah",
-  maturity: "2031-10-10",
-  currency: "USD",
-  profitRateBps: 520,
-  paymentsPerYear: 2,
-  unitValue: 10n * USD,
-  restrictedJurisdictions: ["US"],
-  maxHolding: 100n,
-};
+const terms = DEMO_SERIES;
 
 // Devnet-only keys, persisted so reruns reuse the same funded issuer.
 function key(name: string): Keypair {

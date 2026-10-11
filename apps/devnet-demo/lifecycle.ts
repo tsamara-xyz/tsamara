@@ -29,6 +29,7 @@ import {
   initializeComplianceIx,
   issueSeriesIxs,
   type PaymentToken,
+  publishTermsIxs,
   registerInvestorIx,
   subscribeIxs,
   tradeIxs,
@@ -102,6 +103,7 @@ async function main() {
     }),
     [issuer, sukuk],
   );
+  await send(publishTermsIxs(issuer.publicKey, sukuk.publicKey, terms), [issuer]);
   await send(
     [
       initializeComplianceIx({

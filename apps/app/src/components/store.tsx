@@ -151,10 +151,3 @@ export function Providers({ children }: { children: ReactNode }) {
     </QueryClientProvider>
   );
 }
-
-/** Units outstanding over time, from subscription events. Drives the charts. */
-export function outstandingSeries(events: ChainEvent[]): number[] {
-  const subscriptions = events.filter((e) => e.kind === "subscription").sort((a, b) => (a.time ?? 0) - (b.time ?? 0));
-  let total = 0;
-  return [0, ...subscriptions.map((e) => (total += Number(e.units)))];
-}

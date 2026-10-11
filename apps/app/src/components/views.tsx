@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { investorCount, outstandingSeries, outstandingUnits } from "@/lib/activity";
 import { type Asset, assetsFor, frequency, rate } from "@/lib/assets";
 import { api, type ChainEvent, explorer, short, usd } from "@/lib/chain";
 import { SeriesTable } from "./series-table";
-import { outstandingSeries, useStore } from "./store";
+import { useStore } from "./store";
 import { AssetIcon, ConnectButtons, Sparkline, StatusPill, TradePanel } from "./ui";
 
 const sum = (values: bigint[]) => values.reduce((a, b) => a + b, 0n);
@@ -54,7 +55,7 @@ export function ExplorePage() {
 
   const decimals = series.paymentDecimals;
   const chart = outstandingSeries(events);
-  const outstanding = sum(holders.map((h) => BigInt(h.units)));
+  const outstanding = outstandingUnits(holders);
   const assets = assetsFor(series);
   const shown = assets.filter(
     (a) =>
@@ -132,7 +133,7 @@ export function ExplorePage() {
               </Link>
             ))}
           <p className="muted small">
-            {String(outstanding)} units outstanding across {holders.filter((h) => h.units !== "0").length} investors.
+            {String(outstanding)} units outstanding across {investorCount(holders)} investors.
           </p>
         </div>
         <div className="card">
@@ -198,14 +199,14 @@ export function AssetPage() {
   }
   const t = series.terms;
   const decimals = series.paymentDecimals;
-  const outstanding = sum(holders.map((h) => BigInt(h.units)));
+  const outstanding = outstandingUnits(holders);
   const stats: [string, string][] = [
     ["Profit rate", `${rate(asset.profitRateBps)} p.a.`],
     ["Distributions", frequency(asset.paymentsPerYear)],
     ["Maturity", asset.maturity],
     ["Structure", asset.akad],
     ["Outstanding", usd(outstanding * asset.unitValue, decimals)],
-    ["Investors", String(holders.filter((h) => h.units !== "0").length)],
+    ["Investors", String(investorCount(holders))],
     ["Holding cap", `${t.maxHolding} units`],
     ["Not offered in", t.restrictedJurisdictions.join(", ") || "none"],
   ];

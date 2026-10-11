@@ -3,6 +3,7 @@ import {
   createInitializeDefaultAccountStateInstruction,
   createInitializeMetadataPointerInstruction,
   createInitializeMintInstruction,
+  createInitializeTransferHookInstruction,
   ExtensionType,
   getAssociatedTokenAddressSync,
   getMintLen,
@@ -12,6 +13,7 @@ import {
 } from "@solana/spl-token";
 import { createInitializeInstruction, createUpdateFieldInstruction, pack } from "@solana/spl-token-metadata";
 import { type Connection, type PublicKey, SystemProgram, type TransactionInstruction } from "@solana/web3.js";
+import { COMPLIANCE_PROGRAM_ID } from "./compliance";
 import { type SeriesTerms, termsToFields } from "./series";
 
 /** Sukuk units are whole numbers. */
@@ -40,7 +42,11 @@ export async function issueSeriesIxs(
 ): Promise<TransactionInstruction[]> {
   const { issuer, compliance, mint, terms } = p;
   const fields = termsToFields(terms);
-  const mintLen = getMintLen([ExtensionType.MetadataPointer, ExtensionType.DefaultAccountState]);
+  const mintLen = getMintLen([
+    ExtensionType.MetadataPointer,
+    ExtensionType.DefaultAccountState,
+    ExtensionType.TransferHook,
+  ]);
   const metaLen =
     TYPE_SIZE +
     LENGTH_SIZE +
@@ -55,6 +61,8 @@ export async function issueSeriesIxs(
     }),
     createInitializeMetadataPointerInstruction(mint, issuer, mint, T22),
     createInitializeDefaultAccountStateInstruction(mint, AccountState.Frozen, T22),
+    // Every transfer calls the compliance program, which checks the recipient's record and the holding cap.
+    createInitializeTransferHookInstruction(mint, compliance, COMPLIANCE_PROGRAM_ID, T22),
     createInitializeMintInstruction(mint, SUKUK_DECIMALS, issuer, compliance, T22),
     createInitializeInstruction({
       programId: T22,

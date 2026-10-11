@@ -2,9 +2,10 @@
 import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { ata, type PaymentToken, transferIx } from "@tsamara/sukuk";
 
-const API = process.env.NEXT_PUBLIC_API ?? "http://localhost:8788";
-const INDEXER = process.env.NEXT_PUBLIC_INDEXER ?? "http://localhost:8787";
-export const conn = new Connection(process.env.NEXT_PUBLIC_RPC ?? "https://api.devnet.solana.com", "confirmed");
+// `||`, not `??`: a build that passes an unset variable through leaves an empty string, which must fall back too.
+const API = process.env.NEXT_PUBLIC_API || "http://localhost:8788";
+const INDEXER = process.env.NEXT_PUBLIC_INDEXER || "http://localhost:8787";
+export const conn = new Connection(process.env.NEXT_PUBLIC_RPC || "https://api.devnet.solana.com", "confirmed");
 
 export interface Series {
   sukukMint: string;

@@ -52,7 +52,7 @@ export function SeriesTable(props: {
       }),
       column.accessor("profitRateBps", {
         id: "rate",
-        header: "Profit rate",
+        header: "Expected profit rate",
         cell: ({ getValue }) => <span className="up">{rate(getValue())}</span>,
       }),
       column.accessor("maturity", { header: "Maturity" }),

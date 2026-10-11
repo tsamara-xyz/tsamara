@@ -19,14 +19,6 @@
         "@tsamara/sukuk": "workspace:*",
       },
     },
-    "apps/indexer": {
-      "name": "@tsamara/indexer",
-      "dependencies": {
-        "@solana/spl-token": "^0.4.15",
-        "@solana/web3.js": "^1.99.0",
-        "@tsamara/sukuk": "workspace:*",
-      },
-    },
     "apps/landing": {
       "name": "@tsamara/landing",
       "dependencies": {
@@ -301,8 +293,6 @@
     "@swc/helpers": ["@swc/helpers@0.5.23", "", { "dependencies": { "tslib": "^2.8.0" } }, "sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw=="],
 
     "@tsamara/devnet-demo": ["@tsamara/devnet-demo@workspace:apps/devnet-demo"],
-
-    "@tsamara/indexer": ["@tsamara/indexer@workspace:apps/indexer"],
 
     "@tsamara/landing": ["@tsamara/landing@workspace:apps/landing"],
 

@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "demo": "bun apps/devnet-demo/lifecycle.ts",
-    "indexer": "bun apps/indexer/index.ts"
+    "indexer": "cargo run --release --manifest-path apps/indexer/Cargo.toml --"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",

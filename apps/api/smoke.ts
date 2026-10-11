@@ -4,6 +4,7 @@
 
 import assert from "node:assert";
 import { Connection, Keypair, Transaction } from "@solana/web3.js";
+import { LEVEL, sumsub } from "./sumsub";
 
 const API = process.env.API ?? "http://localhost:8788";
 const conn = new Connection(process.env.RPC ?? "https://api.devnet.solana.com", "confirmed");
@@ -58,4 +59,28 @@ for (let i = 0; ; i++) {
 const paid = (await call("/admin/distribute", {}, admin)).data;
 const mine = paid.payouts.find((p: { owner: string }) => p.owner === wallet);
 assert.equal(mine.amount, "6500000"); // 25 units x $10 x 5.20% / 2 = $6.50
+// With Sumsub configured: approval comes from the provider's verdict and country, read server-side.
+if ((await call("/series")).data.kyc === "sumsub") {
+  const verified = async (country: string) => {
+    const address = Keypair.generate().publicKey.toBase58();
+    await call("/faucet", { wallet: address });
+    assert.equal((await call("/kyc/token", { wallet: address })).data.token.startsWith("_act-sbx-"), true);
+    // Stands in for the investor completing the widget: an applicant with a known country.
+    await sumsub("POST", `/resources/applicants?levelName=${LEVEL}`, {
+      externalUserId: address,
+      fixedInfo: { country },
+    });
+    assert.equal((await call("/kyc/complete", { wallet: address })).data.status, "pending");
+    await call("/admin/kyc/sandbox-review", { wallet: address }, admin);
+    return { address, result: await call("/kyc/complete", { wallet: address }) };
+  };
+  const german = await verified("DEU");
+  assert.deepEqual([german.result.data.status, german.result.data.jurisdiction], ["approved", "DE"]);
+  assert.equal((await call(`/investors/${german.address}`)).data.registered, true);
+  const american = await verified("USA");
+  assert.equal(american.result.status, 422, "a verified US resident must still be refused");
+  assert.equal((await call(`/investors/${american.address}`)).data.registered, false);
+  console.log("Sumsub KYC check passed: DE approved onchain, US refused");
+}
+
 console.log("API smoke check passed for", wallet);

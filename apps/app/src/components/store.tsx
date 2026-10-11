@@ -1,11 +1,12 @@
 "use client";
 
+import "@/lib/buffer-polyfill";
+
 // Shared app state. Server data (series, holders, events, position) lives in TanStack Query;
 // this context adds the connected wallet, the notice bar, the search box and the action runner.
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Buffer } from "buffer";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   api,
@@ -18,9 +19,6 @@ import {
   type Series,
   type Wallet,
 } from "@/lib/chain";
-
-// @solana/web3.js and spl-token use Node's Buffer.
-globalThis.Buffer ??= Buffer;
 
 // The indexer trails the chain by a few seconds, so poll rather than fetch once.
 const POLL_MS = 15_000;

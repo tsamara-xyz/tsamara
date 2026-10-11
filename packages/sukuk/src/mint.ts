@@ -30,8 +30,9 @@ export const ata = (mint: PublicKey, owner: PublicKey, programId: PublicKey = T2
   getAssociatedTokenAddressSync(mint, owner, false, programId);
 
 /**
- * Issue a sukuk series as a Token-2022 mint. Terms live in the mint's own metadata and every holder
- * account starts frozen until the compliance authority approves it. Sign with issuer and mint.
+ * Issue a sukuk series as a Token-2022 mint. Every holder account starts frozen until the compliance
+ * authority approves it. The account is funded for the full terms; publish them next with `publishTermsIxs`.
+ * Sign with issuer and mint.
  *
  * Duties are split across keys: `issuer` mints units and maintains the terms, `compliance` approves
  * and revokes investors. On mainnet each should be a multisig.
@@ -74,8 +75,14 @@ export async function issueSeriesIxs(
       symbol: terms.symbol,
       uri: "",
     }),
-    ...fields.map(([field, value]) =>
-      createUpdateFieldInstruction({ programId: T22, metadata: mint, updateAuthority: issuer, field, value }),
-    ),
   ];
 }
+
+/**
+ * Publish the series terms as metadata fields on the mint. Sent as its own transaction after
+ * `issueSeriesIxs`, so issuance stays well under the transaction size limit as terms are added. Sign with issuer.
+ */
+export const publishTermsIxs = (issuer: PublicKey, mint: PublicKey, terms: SeriesTerms): TransactionInstruction[] =>
+  termsToFields(terms).map(([field, value]) =>
+    createUpdateFieldInstruction({ programId: T22, metadata: mint, updateAuthority: issuer, field, value }),
+  );

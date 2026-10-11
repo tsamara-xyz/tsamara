@@ -128,7 +128,7 @@ const cards: Card[] = [
 
           <section class="story-panel story-panel-bazaar" aria-label="How rules are enforced">
             <h2>Rules the chain enforces.</h2>
-            <p>Holder accounts start frozen, issuer and compliance keys are separate, and every trade settles atomically. No custom program to trust.</p>
+            <p>Holder accounts start frozen, a transfer hook checks every recipient and their holding cap, and every trade settles atomically.</p>
             <a class="note-button" href={REPO}>
               <span aria-hidden="true">↗</span>
               <span>Read the code</span>

@@ -2,7 +2,7 @@
 
 What a regulated sukuk offering needs, what Tsamara does about each item today, and what code cannot solve.
 
-This is an engineering document, not legal advice. Tsamara is a devnet prototype with a mock series: it holds no licence, has no regulatory approval and no sharia certification. The requirements below are the ones we designed against and must be validated with counsel and a sharia board for any real issuance.
+This is an engineering document, not legal advice. The legal and sharia position behind it is in [REGULATION.md](REGULATION.md). Tsamara is a devnet prototype with a mock series: it holds no licence, has no regulatory approval and no sharia certification. The requirements below are the ones we designed against and must be validated with counsel and a sharia board for any real issuance.
 
 ## Status key
 
@@ -46,7 +46,7 @@ This is an engineering document, not legal advice. Tsamara is a devnet prototype
 | Audit trail | Every approval, subscription, transfer and distribution is a confirmed transaction; the indexer derives a per-wallet history from them | Onchain, read through tooling |
 | Accurate pro rata distributions | Integer math, rounded down, unit-tested; holders are read from the indexer | Tooling |
 | A distribution cannot be paid twice | Not guarded; a retry would pay again ([#23](https://github.com/tsamara-xyz/tsamara/issues/23)) | Designed |
-| Settlement asset | A mock dollar token on devnet; a real stablecoin on the same token program works without code changes | External |
+| Settlement asset | A mock dollar token on devnet; a real stablecoin on the same token program works without code changes. Stablecoin settlement is not permitted everywhere: in Indonesia the rupiah is mandatory for domestic transactions | External |
 | Registry of record | The chain is the registry in this design; whether that is legally sufficient depends on the jurisdiction | External |
 
 ## Sharia
@@ -54,15 +54,17 @@ This is an engineering document, not legal advice. Tsamara is a devnet prototype
 | Requirement | Control | Status |
 |---|---|---|
 | The underlying sukuk is sharia-compliant | Inherited from the real instrument; the demo series is a mock | External |
+| The series may trade at a negotiated price | Only defensible while the underlying is majority tangible assets. The tangibility ratio is not stored or enforced yet | Designed |
 | The tokenized structure preserves the holder's rights in the underlying asset | Depends on the legal wrapper between the token and the sukuk, which does not exist yet | External |
 | Sharia board review of the structure and of secondary trading | None | External |
-| Returns are profit distributions, not interest | The series models a fixed periodic distribution set by the akad; we deliberately do not use Token-2022's interest-bearing extension | Onchain |
+| Returns are profit distributions, not interest | The series models an expected periodic distribution set by the akad; we deliberately do not use Token-2022's interest-bearing extension | Onchain |
 
 ## Issuance and distribution
 
 | Requirement | Control | Status |
 |---|---|---|
-| Authority to issue or tokenize the instrument | None | External |
+| Authority to issue or tokenize the instrument | None. Only a sovereign's own issuer can issue its sukuk; anyone else issues a new instrument that holds it | External |
+| The token carries a real claim | The prototype token represents nothing. A real one needs a trust or wakalah arrangement giving holders a beneficial share, a trustee and a default waterfall | External |
 | Licence to distribute to investors in each jurisdiction | None | External |
 | Custody of the underlying sukuk | None | External |
 | Disclosure documents and risk warnings | A prototype notice on every surface; no offering document | External |

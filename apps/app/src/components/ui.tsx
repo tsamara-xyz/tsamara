@@ -1,5 +1,7 @@
+"use client";
+
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { api, explorer, short, subscribe, transfer, usd } from "./chain";
+import { api, explorer, short, subscribe, transfer, usd } from "@/lib/chain";
 import { useStore } from "./store";
 
 export function AssetIcon({ symbol, size = 36 }: { symbol: string; size?: number }) {

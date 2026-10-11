@@ -44,3 +44,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # indexer build output
 apps/indexer/target
+
+# next
+.next
+next-env.d.ts

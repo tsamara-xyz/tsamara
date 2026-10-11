@@ -1,9 +1,13 @@
-import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { type Asset, assetsFor, frequency, rate } from "./assets";
-import { api, type ChainEvent, explorer, short, usd } from "./chain";
-import { AssetIcon, ConnectButtons, Sparkline, StatusPill, TradePanel } from "./components";
+"use client";
+
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { type Asset, assetsFor, frequency, rate } from "@/lib/assets";
+import { api, type ChainEvent, explorer, short, usd } from "@/lib/chain";
+import { SeriesTable } from "./series-table";
 import { outstandingSeries, useStore } from "./store";
+import { AssetIcon, ConnectButtons, Sparkline, StatusPill, TradePanel } from "./ui";
 
 const sum = (values: bigint[]) => values.reduce((a, b) => a + b, 0n);
 
@@ -43,10 +47,9 @@ function Activity({ events, decimals, empty }: { events: ChainEvent[]; decimals:
   );
 }
 
-export function ExplorePage({ query }: { query: string }) {
-  const { series, holders, events, wallet, position } = useStore();
+export function ExplorePage() {
+  const { series, holders, events, wallet, position, search: query } = useStore();
   const [tab, setTab] = useState<"all" | "live" | "preview">("all");
-  const navigate = useNavigate();
   if (!series) return <p className="muted pad">Loading series…</p>;
 
   const decimals = series.paymentDecimals;
@@ -83,7 +86,7 @@ export function ExplorePage({ query }: { query: string }) {
           </div>
         </dl>
         <Sparkline points={chart} width={220} height={44} />
-        <Link className="more" to="/portfolio">
+        <Link className="more" href="/portfolio">
           View Portfolio →
         </Link>
       </section>
@@ -93,7 +96,7 @@ export function ExplorePage({ query }: { query: string }) {
           <h1>Sovereign Sukuk, Open Access</h1>
           <p>Dollar sukuk in $10 units, with every transfer rule enforced onchain.</p>
           {live && (
-            <Link className="btn light" to={`/assets/${live.symbol.toLowerCase()}`}>
+            <Link className="btn light" href={`/assets/${live.symbol.toLowerCase()}`}>
               Invest now
             </Link>
           )}
@@ -116,7 +119,7 @@ export function ExplorePage({ query }: { query: string }) {
           {assets
             .filter((a) => a.live)
             .map((a) => (
-              <Link className="feature" key={a.symbol} to={`/assets/${a.symbol.toLowerCase()}`}>
+              <Link className="feature" key={a.symbol} href={`/assets/${a.symbol.toLowerCase()}`}>
                 <AssetIcon symbol={a.symbol} />
                 <span>
                   <strong>{a.symbol}</strong>
@@ -170,57 +173,7 @@ export function ExplorePage({ query }: { query: string }) {
             </button>
           ))}
         </div>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Asset Name</th>
-              <th className="num">Price</th>
-              <th className="num">Profit rate</th>
-              <th>Maturity</th>
-              <th className="num">Outstanding</th>
-              <th>Asset Status</th>
-              <th className="num">Units issued</th>
-            </tr>
-          </thead>
-          <tbody>
-            {shown.map((a, i) => (
-              <tr
-                key={a.symbol}
-                className={a.live ? "clickable" : "dim"}
-                onClick={() => a.live && navigate(`/assets/${a.symbol.toLowerCase()}`)}
-              >
-                <td>{i + 1}</td>
-                <td>
-                  <span className="name">
-                    <AssetIcon symbol={a.symbol} />
-                    <span>
-                      <strong>{a.symbol}</strong>
-                      <small>{a.name}</small>
-                    </span>
-                  </span>
-                </td>
-                <td className="num">{usd(a.unitValue, decimals)}</td>
-                <td className="num up">{rate(a.profitRateBps)}</td>
-                <td>{a.maturity}</td>
-                <td className="num">{a.live ? usd(outstanding * a.unitValue, decimals) : "—"}</td>
-                <td>
-                  <StatusPill live={a.live} />
-                </td>
-                <td className="num">
-                  <Sparkline points={a.live ? chart : []} muted={!a.live} />
-                </td>
-              </tr>
-            ))}
-            {shown.length === 0 && (
-              <tr>
-                <td colSpan={8} className="muted">
-                  No series match “{query}”.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <SeriesTable assets={shown} decimals={decimals} outstanding={outstanding} chart={chart} query={query} />
         <p className="muted small pad">
           Preview series illustrate the catalogue. They are not issued and cannot be bought.
         </p>
@@ -230,7 +183,7 @@ export function ExplorePage({ query }: { query: string }) {
 }
 
 export function AssetPage() {
-  const { symbol } = useParams();
+  const { symbol } = useParams<{ symbol: string }>();
   const { series, holders, events } = useStore();
   if (!series) return <p className="muted pad">Loading series…</p>;
   const asset: Asset | undefined = assetsFor(series).find(
@@ -239,7 +192,7 @@ export function AssetPage() {
   if (!asset) {
     return (
       <p className="muted pad">
-        This series is not open. <Link to="/">Back to all series</Link>
+        This series is not open. <Link href="/">Back to all series</Link>
       </p>
     );
   }
@@ -271,7 +224,7 @@ export function AssetPage() {
     <div className="detail">
       <div>
         <p className="crumbs">
-          <Link to="/">Explore</Link> / {asset.symbol}
+          <Link href="/">Explore</Link> / {asset.symbol}
         </p>
         <header className="asset-head">
           <AssetIcon symbol={asset.symbol} size={52} />
@@ -412,7 +365,7 @@ export function PortfolioPage() {
                 <td className="num">{usd(value, decimals)}</td>
                 <td className="num up">{rate(series.terms.profitRateBps)}</td>
                 <td className="num">
-                  <Link className="btn small" to={`/assets/${series.terms.symbol.toLowerCase()}`}>
+                  <Link className="btn small" href={`/assets/${series.terms.symbol.toLowerCase()}`}>
                     Trade
                   </Link>
                 </td>
@@ -421,7 +374,7 @@ export function PortfolioPage() {
               <tr>
                 <td colSpan={6} className="muted">
                   No holdings yet.{" "}
-                  <Link to={`/assets/${series.terms.symbol.toLowerCase()}`}>Subscribe to {series.terms.symbol}</Link>
+                  <Link href={`/assets/${series.terms.symbol.toLowerCase()}`}>Subscribe to {series.terms.symbol}</Link>
                 </td>
               </tr>
             )}
@@ -439,7 +392,9 @@ export function PortfolioPage() {
 
 export function OperatorPage() {
   const { series, holders, busy, run } = useStore();
-  const [token, setToken] = useState(() => sessionStorage.getItem("tsamara-admin") ?? "");
+  const [token, setToken] = useState("");
+  // Read after mount: sessionStorage does not exist while the page is rendered on the server.
+  useEffect(() => setToken(sessionStorage.getItem("tsamara-admin") ?? ""), []);
   const saveToken = (value: string) => {
     setToken(value);
     sessionStorage.setItem("tsamara-admin", value);

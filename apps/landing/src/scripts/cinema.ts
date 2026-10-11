@@ -7,9 +7,14 @@ const track = document.querySelector<HTMLElement>(".sights-track")!;
 const controls = document.querySelector<HTMLElement>(".sights-controls")!;
 const originals = [...document.querySelectorAll<HTMLElement>(".sight-card")];
 
-let targetMouseX = 0, targetMouseY = 0, mouseX = 0, mouseY = 0;
-let targetScroll = 0, smoothScroll = 0;
-let initialized = false, rafPending = false;
+let targetMouseX = 0,
+  targetMouseY = 0,
+  mouseX = 0,
+  mouseY = 0;
+let targetScroll = 0,
+  smoothScroll = 0;
+let initialized = false,
+  rafPending = false;
 let cards: HTMLElement[] = [];
 const count = originals.length;
 let active = count;
@@ -21,7 +26,8 @@ const smoothstep = (e0: number, e1: number, v: number) => {
 };
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const segmentInOut = (s: number, a: number, b: number, c: number, d: number) => {
-  const enter = smoothstep(a, b, s), exit = smoothstep(c, d, s);
+  const enter = smoothstep(a, b, s),
+    exit = smoothstep(c, d, s);
   return { enter, exit, active: enter * (1 - exit) };
 };
 const scrollDistance = () => clamp(-section.getBoundingClientRect().top, 0, section.offsetHeight - window.innerHeight);
@@ -45,10 +51,10 @@ function update() {
   const frame3 = segmentInOut(smoothScroll, 1760, 2140, 2540, 2700);
   const progress = clamp(smoothScroll / 2700);
   const introExit = smoothstep(90, 650, smoothScroll);
-  const sightsEnter = Math.pow(smoothstep(2760, 3560, smoothScroll), 1.55);
+  const sightsEnter = smoothstep(2760, 3560, smoothScroll) ** 1.55;
   const controlsEnter = smoothstep(3360, 3660, smoothScroll);
   const blurActive = clamp(frame2.active + frame3.active);
-  const splitDrift = Math.pow(frame2.enter, 1.5);
+  const splitDrift = frame2.enter ** 1.5;
   const backScale = 0.76 + progress * 0.2 + frame2.enter * 0.18 + frame3.enter * 0.16;
   const heroY = progress * -74;
   const heroScale = progress * 0.23;
@@ -119,7 +125,8 @@ function update() {
     Math.abs(smoothScroll - targetScroll) > 0.08 ||
     Math.abs(mouseX - targetMouseX) > 0.001 ||
     Math.abs(mouseY - targetMouseY) > 0.001
-  ) requestTick();
+  )
+    requestTick();
 }
 
 function requestTick() {
@@ -134,7 +141,7 @@ function updateSlider() {
   if (!first) return;
   const gap = parseFloat(getComputedStyle(track).columnGap || "0");
   set("--sights-shift", `${-(first.offsetWidth + gap) * active}px`);
-  cards.forEach((card, i) => card.classList.toggle("is-active", i === active));
+  for (const [i, card] of cards.entries()) card.classList.toggle("is-active", i === active);
 }
 
 function moveSlider(dir: number) {
@@ -186,11 +193,15 @@ window.addEventListener("resize", () => {
   updateSlider();
   requestTick();
 });
-window.addEventListener("pointermove", (e) => {
-  targetMouseX = e.clientX / window.innerWidth - 0.5;
-  targetMouseY = e.clientY / window.innerHeight - 0.5;
-  requestTick();
-}, { passive: true });
+window.addEventListener(
+  "pointermove",
+  (e) => {
+    targetMouseX = e.clientX / window.innerWidth - 0.5;
+    targetMouseY = e.clientY / window.innerHeight - 0.5;
+    requestTick();
+  },
+  { passive: true },
+);
 document.querySelector(".sight-prev")!.addEventListener("click", () => moveSlider(-1));
 document.querySelector(".sight-next")!.addEventListener("click", () => moveSlider(1));
 

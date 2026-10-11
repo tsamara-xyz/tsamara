@@ -1,6 +1,6 @@
 import type { PublicKey } from "@solana/web3.js";
 import type { PaymentToken } from "./mint";
-import { type SeriesTerms, periodicDistribution } from "./series";
+import { periodicDistribution, type SeriesTerms } from "./series";
 import { payIx } from "./settlement";
 
 export interface Holding {

@@ -1,10 +1,17 @@
-import { type Connection, type PublicKey, SystemProgram, type TransactionInstruction } from "@solana/web3.js";
 import {
-  AccountState, ExtensionType, LENGTH_SIZE, TOKEN_2022_PROGRAM_ID as T22, TYPE_SIZE,
-  createInitializeDefaultAccountStateInstruction, createInitializeMetadataPointerInstruction,
-  createInitializeMintInstruction, getAssociatedTokenAddressSync, getMintLen,
+  AccountState,
+  createInitializeDefaultAccountStateInstruction,
+  createInitializeMetadataPointerInstruction,
+  createInitializeMintInstruction,
+  ExtensionType,
+  getAssociatedTokenAddressSync,
+  getMintLen,
+  LENGTH_SIZE,
+  TOKEN_2022_PROGRAM_ID as T22,
+  TYPE_SIZE,
 } from "@solana/spl-token";
 import { createInitializeInstruction, createUpdateFieldInstruction, pack } from "@solana/spl-token-metadata";
+import { type Connection, type PublicKey, SystemProgram, type TransactionInstruction } from "@solana/web3.js";
 import { type SeriesTerms, termsToFields } from "./series";
 
 /** Sukuk units are whole numbers. */
@@ -28,13 +35,15 @@ export const ata = (mint: PublicKey, owner: PublicKey, programId: PublicKey = T2
  * and revokes investors. On mainnet each should be a multisig.
  */
 export async function issueSeriesIxs(
-  conn: Connection, p: { issuer: PublicKey; compliance: PublicKey; mint: PublicKey; terms: SeriesTerms },
+  conn: Connection,
+  p: { issuer: PublicKey; compliance: PublicKey; mint: PublicKey; terms: SeriesTerms },
 ): Promise<TransactionInstruction[]> {
   const { issuer, compliance, mint, terms } = p;
   const fields = termsToFields(terms);
   const mintLen = getMintLen([ExtensionType.MetadataPointer, ExtensionType.DefaultAccountState]);
   const metaLen =
-    TYPE_SIZE + LENGTH_SIZE +
+    TYPE_SIZE +
+    LENGTH_SIZE +
     pack({ mint, name: terms.name, symbol: terms.symbol, uri: "", additionalMetadata: fields }).length;
   return [
     SystemProgram.createAccount({
@@ -48,8 +57,14 @@ export async function issueSeriesIxs(
     createInitializeDefaultAccountStateInstruction(mint, AccountState.Frozen, T22),
     createInitializeMintInstruction(mint, SUKUK_DECIMALS, issuer, compliance, T22),
     createInitializeInstruction({
-      programId: T22, metadata: mint, updateAuthority: issuer, mint, mintAuthority: issuer,
-      name: terms.name, symbol: terms.symbol, uri: "",
+      programId: T22,
+      metadata: mint,
+      updateAuthority: issuer,
+      mint,
+      mintAuthority: issuer,
+      name: terms.name,
+      symbol: terms.symbol,
+      uri: "",
     }),
     ...fields.map(([field, value]) =>
       createUpdateFieldInstruction({ programId: T22, metadata: mint, updateAuthority: issuer, field, value }),

@@ -1,6 +1,7 @@
 "use client";
 
 // Small presentational pieces shared by every page.
+import type { ReactNode } from "react";
 import { explorer } from "@/lib/chain";
 import { useStore } from "./store";
 
@@ -78,6 +79,16 @@ export function ConnectButtons() {
       <button type="button" className="btn" disabled={busy} onClick={() => connect("phantom")}>
         Connect Phantom
       </button>
+    </div>
+  );
+}
+
+/** The centred icon-and-sentence shown when a section has nothing to list yet. */
+export function EmptyState({ icon, children }: { icon: string; children: ReactNode }) {
+  return (
+    <div className="empty">
+      <span aria-hidden="true">{icon}</span>
+      <p>{children}</p>
     </div>
   );
 }

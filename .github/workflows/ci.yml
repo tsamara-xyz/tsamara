@@ -15,3 +15,12 @@ jobs:
       - run: bun test
       - run: bun run --cwd apps/landing check
       - run: bun run --cwd apps/landing build
+  indexer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/indexer
+      - run: cargo test --locked --manifest-path apps/indexer/Cargo.toml

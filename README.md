@@ -86,7 +86,7 @@ Use the built-in test wallet, or Phantom switched to devnet. Request test dollar
 
 ## Status
 
-This is a prototype. It is not compliance-ready or production-ready, and it does not claim any regulatory approval or sharia certification. The gaps are tracked as issues labelled [`compliance`](https://github.com/tsamara-xyz/tsamara/labels/compliance) and [`production`](https://github.com/tsamara-xyz/tsamara/labels/production).
+This is a prototype. It is not compliance-ready or production-ready, and it does not claim any regulatory approval or sharia certification. [docs/COMPLIANCE.md](docs/COMPLIANCE.md) maps each requirement to its control and honest status. The gaps are tracked as issues labelled [`compliance`](https://github.com/tsamara-xyz/tsamara/labels/compliance) and [`production`](https://github.com/tsamara-xyz/tsamara/labels/production).
 
 ## License
 

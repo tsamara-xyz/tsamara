@@ -162,7 +162,14 @@ export function explain(error: unknown): string {
   if (/AccountNotInitialized|0xbc4/.test(text)) return "Rejected onchain: the recipient is not a registered investor.";
   if (/insufficient funds|0x1\b/.test(text)) return "Not enough balance for this transaction.";
   if (/User rejected/i.test(text)) return "You cancelled the request in your wallet.";
-  return error instanceof Error ? error.message : String(error);
+  // spl-token throws these with an empty message when the recipient never opened a sukuk account.
+  if (error instanceof Error && /Account(Data)?NotFound/.test(error.name))
+    return "That wallet has no sukuk account, so it cannot receive units. The recipient must onboard first.";
+  if (error instanceof Error && error.name === "TokenOwnerOffCurveError")
+    return "That address belongs to a program, not a wallet, so it cannot hold units.";
+  if (/Non-base58|Invalid public key/i.test(text)) return "That is not a valid wallet address.";
+  const message = error instanceof Error ? error.message : String(error);
+  return message || "The request failed without an error message.";
 }
 
 export const explorer = (signature: string) => `https://explorer.solana.com/tx/${signature}?cluster=devnet`;

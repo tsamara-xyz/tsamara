@@ -8,7 +8,7 @@ export interface SeriesTerms {
   maturity: string;
   /** Denomination, e.g. "USD". */
   currency: string;
-  /** Fixed annual profit rate in basis points. */
+  /** Expected annual profit rate in basis points. It is an expectation set by the structure, not a guarantee. */
   profitRateBps: number;
   /** Periodic distributions per year (2 = semiannual). */
   paymentsPerYear: number;

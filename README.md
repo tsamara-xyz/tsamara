@@ -1,3 +1,5 @@
+<img src="apps/landing/public/android-chrome-192x192.png" alt="Tsamara logo" width="72" />
+
 # Tsamara
 
 Sovereign sukuk for everyone: buy from $10 in USDC, trade any time, receive distributions onchain.

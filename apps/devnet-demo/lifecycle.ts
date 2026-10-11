@@ -48,7 +48,7 @@ const bal = async (mint: PublicKey, owner: PublicKey, programId = T22) =>
 const link = (sig: string) => `https://explorer.solana.com/tx/${sig}?cluster=devnet`;
 
 async function main() {
-  const issuer = key("issuer"), ani = key("investor-ani"), budi = key("investor-budi"), stranger = key("no-kyc");
+  const issuer = key("issuer"), compliance = key("compliance"), ani = key("investor-ani"), budi = key("investor-budi"), stranger = key("no-kyc");
   if ((await conn.getBalance(issuer.publicKey)) < 0.5 * LAMPORTS_PER_SOL) {
     console.log(`Fund the issuer with devnet SOL, then rerun:\n  ${issuer.publicKey.toBase58()}\n  https://faucet.solana.com`);
     process.exit(1);
@@ -63,7 +63,7 @@ async function main() {
   const usdc: PaymentToken = { mint: await createMint(conn, issuer, issuer.publicKey, null, 6), decimals: 6, programId: TOKEN_PROGRAM_ID };
   const usdcBal = (owner: PublicKey) => bal(usdc.mint, owner, usdc.programId);
   const sukuk = Keypair.generate();
-  const s1 = await send(await issueSeriesIxs(conn, issuer.publicKey, sukuk.publicKey, terms), [issuer, sukuk]);
+  const s1 = await send(await issueSeriesIxs(conn, { issuer: issuer.publicKey, compliance: compliance.publicKey, mint: sukuk.publicKey, terms }), [issuer, sukuk]);
   console.log("1. Sukuk series issued:", sukuk.publicKey.toBase58(), "\n  ", link(s1));
 
   // Open everyone's accounts and give investors $5,000 each.
@@ -74,9 +74,11 @@ async function main() {
     ...[ani, budi, stranger].map((k) => createMintToInstruction(usdc.mint, ata(usdc.mint, k.publicKey, usdc.programId), issuer.publicKey, 5_000n * USD, [], usdc.programId)),
   ], [issuer]);
 
-  // 2. KYC: the issuer approves Ani and Budi. The stranger stays frozen.
-  await send([ani, budi].map((k) => approveInvestorIx(sukuk.publicKey, k.publicKey, issuer.publicKey)), [issuer]);
-  console.log("2. KYC approved for Ani and Budi");
+  // 2. KYC: only the compliance authority can approve investors. The issuer's key cannot.
+  const asIssuer = send([approveInvestorIx(sukuk.publicKey, ani.publicKey, issuer.publicKey)], [issuer]);
+  await assert.rejects(asIssuer, "issuer key was able to approve an investor");
+  await send([ani, budi].map((k) => approveInvestorIx(sukuk.publicKey, k.publicKey, compliance.publicKey)), [issuer, compliance]);
+  console.log("2. KYC approved for Ani and Budi by the compliance authority (issuer key refused)");
 
   // 3. Primary subscription: Ani pays $1,000 and receives 100 units in the same transaction.
   const s3 = await send(subscribeIxs({ sukukMint: sukuk.publicKey, payment: usdc, issuer: issuer.publicKey, investor: ani.publicKey, units: 100n, terms }), [issuer, ani]);

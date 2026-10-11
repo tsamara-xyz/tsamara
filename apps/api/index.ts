@@ -22,7 +22,9 @@ import {
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
+import countries from "i18n-iso-countries";
 import { compliance, conn, issuer, payment, send, sukukMint, terms } from "./series";
+import { LEVEL, sumsub, sumsubConfigured } from "./sumsub";
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? randomBytes(12).toString("hex");
 const INDEXER = process.env.INDEXER ?? "http://localhost:8787";
@@ -81,6 +83,7 @@ app.get("/series", (c) =>
       paymentDecimals: payment.decimals,
       issuer: issuer.publicKey,
       complianceProgram: COMPLIANCE_PROGRAM_ID,
+      kyc: sumsubConfigured ? "sumsub" : "manual",
       terms,
     }),
   ),
@@ -155,9 +158,8 @@ app.post("/subscribe", async (c) => {
   return c.json({ transaction: tx.serialize({ requireAllSignatures: false }).toString("base64") });
 });
 
-admin.post("/kyc", async (c) => {
-  const body = await c.req.json();
-  const investor = { wallet: parseWallet(body.wallet), jurisdiction: String(body.jurisdiction ?? "").toUpperCase() };
+// Register the investor with the compliance program and open their account.
+async function approveOnchain(investor: { wallet: PublicKey; jurisdiction: string }) {
   if (!/^[A-Z]{2}$/.test(investor.jurisdiction)) fail(400, "jurisdiction must be an ISO 3166-1 alpha-2 code");
   if (!isEligible(investor.jurisdiction, terms))
     fail(422, `${terms.symbol} is not offered to residents of ${investor.jurisdiction}`);
@@ -172,7 +174,67 @@ admin.post("/kyc", async (c) => {
   });
   // Already registered (for example re-approving after a revocation): only thaw the account.
   const registered = (await conn.getAccountInfo(investorPda(sukukMint, investor.wallet))) !== null;
-  return c.json({ signature: await send(registered ? ixs.slice(1) : ixs, [issuer, compliance]) });
+  return send(registered ? ixs.slice(1) : ixs, [issuer, compliance]);
+}
+
+interface Applicant {
+  id: string;
+  info?: { country?: string; idDocs?: { country?: string }[] };
+  fixedInfo?: { country?: string };
+  review?: { reviewStatus?: string; reviewResult?: { reviewAnswer?: string; rejectLabels?: string[] } };
+}
+
+// The wallet address is the applicant's stable id at the KYC provider.
+const applicant = (wallet: PublicKey) =>
+  sumsub<Applicant>("GET", `/resources/applicants/-;externalUserId=${wallet.toBase58()}/one`);
+
+// ponytail: anyone can start verification for any address; require a wallet signature over a nonce
+// before minting the token once this is more than a sandbox.
+app.post("/kyc/token", async (c) => {
+  const wallet = parseWallet((await c.req.json()).wallet);
+  const path = `/resources/accessTokens?userId=${wallet.toBase58()}&levelName=${encodeURIComponent(LEVEL)}&ttlInSecs=600`;
+  return c.json({ token: (await sumsub<{ token: string }>("POST", path)).token });
+});
+
+// The browser calls this after the widget finishes. The verdict and the country are read from Sumsub
+// server-side; nothing the browser says is trusted.
+// ponytail: called on demand by the app; switch to the applicantReviewed webhook once the API has a public URL.
+app.post("/kyc/complete", async (c) => {
+  const wallet = parseWallet((await c.req.json()).wallet);
+  const { info, fixedInfo, review } = await applicant(wallet).catch(() =>
+    fail(422, "No verification found for this address"),
+  );
+  if (review?.reviewStatus !== "completed") return c.json({ status: "pending" });
+  if (review.reviewResult?.reviewAnswer !== "GREEN")
+    return c.json({ status: "rejected", reason: review.reviewResult?.rejectLabels?.join(", ") || "not approved" });
+  // Sumsub reports ISO alpha-3. With an identity-document level this is the document's country,
+  // not proven residence; add a proof-of-address step before relying on it as residence.
+  const alpha3 = info?.country ?? info?.idDocs?.[0]?.country ?? fixedInfo?.country;
+  const jurisdiction = alpha3 ? countries.alpha3ToAlpha2(alpha3) : undefined;
+  if (!jurisdiction) return fail(422, "Verification has no country on record");
+  return c.json({ status: "approved", jurisdiction, signature: await approveOnchain({ wallet, jurisdiction }) });
+});
+
+// Manual approval by the operator, used when no KYC provider is configured.
+admin.post("/kyc", async (c) => {
+  const body = await c.req.json();
+  const investor = { wallet: parseWallet(body.wallet), jurisdiction: String(body.jurisdiction ?? "").toUpperCase() };
+  return c.json({ signature: await approveOnchain(investor) });
+});
+
+// Sandbox only: stand in for Sumsub's reviewer so a demo does not wait on a human.
+admin.post("/kyc/sandbox-review", async (c) => {
+  const body = await c.req.json();
+  const { id } = await applicant(parseWallet(body.wallet)).catch(() =>
+    fail(422, "No verification found for this address"),
+  );
+  const reviewAnswer = body.answer === "RED" ? "RED" : "GREEN";
+  await sumsub("POST", `/resources/applicants/${id}/status/testCompleted`, {
+    reviewAnswer,
+    rejectLabels: reviewAnswer === "RED" ? ["FRAUDULENT_PATTERNS"] : [],
+    ...(reviewAnswer === "RED" ? { reviewRejectType: "FINAL" } : {}),
+  });
+  return c.json({ reviewAnswer });
 });
 
 admin.post("/distribute", async (c) => {

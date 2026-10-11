@@ -22,11 +22,15 @@ export const ata = (mint: PublicKey, owner: PublicKey, programId: PublicKey = T2
 
 /**
  * Issue a sukuk series as a Token-2022 mint. Terms live in the mint's own metadata and every holder
- * account starts frozen until the issuer approves it. Sign with issuer and mint.
+ * account starts frozen until the compliance authority approves it. Sign with issuer and mint.
+ *
+ * Duties are split across keys: `issuer` mints units and maintains the terms, `compliance` approves
+ * and revokes investors. On mainnet each should be a multisig.
  */
 export async function issueSeriesIxs(
-  conn: Connection, issuer: PublicKey, mint: PublicKey, terms: SeriesTerms,
+  conn: Connection, p: { issuer: PublicKey; compliance: PublicKey; mint: PublicKey; terms: SeriesTerms },
 ): Promise<TransactionInstruction[]> {
+  const { issuer, compliance, mint, terms } = p;
   const fields = termsToFields(terms);
   const mintLen = getMintLen([ExtensionType.MetadataPointer, ExtensionType.DefaultAccountState]);
   const metaLen =
@@ -42,7 +46,7 @@ export async function issueSeriesIxs(
     }),
     createInitializeMetadataPointerInstruction(mint, issuer, mint, T22),
     createInitializeDefaultAccountStateInstruction(mint, AccountState.Frozen, T22),
-    createInitializeMintInstruction(mint, SUKUK_DECIMALS, issuer, issuer, T22),
+    createInitializeMintInstruction(mint, SUKUK_DECIMALS, issuer, compliance, T22),
     createInitializeInstruction({
       programId: T22, metadata: mint, updateAuthority: issuer, mint, mintAuthority: issuer,
       name: terms.name, symbol: terms.symbol, uri: "",

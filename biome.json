@@ -6,7 +6,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "style": { "noNonNullAssertion": "off" }
+      "style": { "noNonNullAssertion": "off", "noDescendingSpecificity": "off" }
     }
   },
   "overrides": [

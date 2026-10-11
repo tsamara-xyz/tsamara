@@ -1,3 +1,3 @@
-import { ExplorePage } from "@/components/views";
+import { ExplorePage } from "@/components/pages/explore";
 
 export default ExplorePage;

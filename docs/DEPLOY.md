@@ -26,3 +26,28 @@ Four containers, one per service. Each has a Dockerfile and reads its configurat
 The indexer keeps its SQLite database in `/srv/.data`. Without a volume it rebuilds the index from the chain on every start, which is fine at this size.
 
 The series is created once by starting the API locally with funded devnet keys (`bun run api`); its addresses are written to `.keys/series.json`.
+
+## Current deployment
+
+The four services run on a single VPS under Coolify, in a project named `tsamara`, built from `main` of this repository with the Dockerfiles above. The server's own nginx terminates TLS and proxies each hostname to a port published on the host.
+
+| Service | Coolify application | Host port |
+|---|---|---|
+| Landing | `tsamara-landing` | 3113 |
+| App | `tsamara-app` | 3114 |
+| API | `tsamara-api` | 3112 |
+| Indexer | `tsamara-indexer` | 3111 |
+
+Things that are easy to get wrong:
+
+- **The API reaches the indexer over the Docker network**, at `http://tsamara-indexer:8787`. The indexer application has the custom network alias `tsamara-indexer`; a container cannot reach a port published on its own host here. An alias only takes effect on a full deploy, not a restart.
+- **`NEXT_PUBLIC_API` and `NEXT_PUBLIC_INDEXER` are build variables** of the app. Changing them means rebuilding it.
+- **Builds run on the server and the disk is small.** Each round of builds leaves several gigabytes of build cache; reclaim it with `docker builder prune --force`, which removes unused cache only.
+- **The indexer serves only after it has caught up**, so it answers a little after its container starts.
+- The host ports are published on all interfaces, because the Coolify API does not accept a loopback binding. Bind them to `127.0.0.1` in the Coolify UI if the firewall does not already cover them.
+
+To check a deployment end to end, run the API smoke test against it:
+
+```sh
+API=https://api.tsamara.xyz INDEXER=https://indexer.tsamara.xyz ADMIN_TOKEN=... bun apps/api/smoke.ts
+```

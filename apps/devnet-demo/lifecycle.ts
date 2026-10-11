@@ -116,6 +116,8 @@ async function main() {
   for (const [i, k] of holders.entries()) assert.equal(await usdcBal(k.publicKey), before[i]! + payouts[i]!.amount);
   console.log(`6. Distribution paid: Amira ${usd(payouts[0]!.amount)}, Lukas ${usd(payouts[1]!.amount)}\n  `, link(s6));
 
+  // Let the indexer and app find this run.
+  writeFileSync(".keys/last-run.json", JSON.stringify({ sukukMint: sukuk.publicKey, paymentMint: usdc.mint, issuer: issuer.publicKey }, null, 2));
   console.log("\nAll checks passed.");
 }
 

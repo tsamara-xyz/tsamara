@@ -77,6 +77,11 @@ if ((await call("/series")).data.kyc === "sumsub") {
   const german = await verified("DEU");
   assert.deepEqual([german.result.data.status, german.result.data.jurisdiction], ["approved", "DE"]);
   assert.equal((await call(`/investors/${german.address}`)).data.registered, true);
+  // Forced transfer: the reason is mandatory, and the units move without the holder signing.
+  const transferOrder = { from: wallet, to: german.address, units: 5, reason: "lost-key", orderedBy: "Smoke test" };
+  assert.equal((await call("/admin/forced-transfer", { ...transferOrder, reason: "" }, admin)).status, 400);
+  assert.equal((await call("/admin/forced-transfer", transferOrder, admin)).status, 200);
+  assert.equal((await call(`/investors/${german.address}`)).data.units, "5");
   const american = await verified("USA");
   assert.equal(american.result.status, 422, "a verified US resident must still be refused");
   assert.equal((await call(`/investors/${american.address}`)).data.registered, false);

@@ -5,6 +5,7 @@ import {
   createInitializeMintInstruction, getAssociatedTokenAddressSync, getMintLen,
 } from "@solana/spl-token";
 import { createInitializeInstruction, createUpdateFieldInstruction, pack } from "@solana/spl-token-metadata";
+import { type SeriesTerms, termsToFields } from "./series";
 
 /** Sukuk units and rupiah are whole numbers. */
 export const DECIMALS = 0;
@@ -52,3 +53,10 @@ export async function createMintIxs(conn: Connection, p: MintParams): Promise<Tr
     ),
   ];
 }
+
+/** Issue a sukuk series: terms live in the mint's metadata and every holder account is frozen until KYC. */
+export const issueSeriesIxs = (conn: Connection, issuer: PublicKey, mint: PublicKey, terms: SeriesTerms) =>
+  createMintIxs(conn, {
+    payer: issuer, mint, authority: issuer,
+    name: terms.name, symbol: terms.symbol, fields: termsToFields(terms), frozenByDefault: true,
+  });

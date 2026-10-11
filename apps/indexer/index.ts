@@ -88,11 +88,17 @@ async function sync() {
     const until = (
       db.query("SELECT signature FROM cursor WHERE address = ?").get(address) as { signature: string } | null
     )?.signature;
-    // ponytail: one page of 1000 signatures per poll; page with `before` if a series ever gets busier than that between polls.
-    const sigs = (await conn.getSignaturesForAddress(new PublicKey(address), { until }))
-      .filter((s) => !s.err)
-      .reverse();
-    for (const { signature } of sigs) {
+    // Signatures come newest first, 1000 per page: walk back with `before` until the last one we stored.
+    const address58 = new PublicKey(address);
+    const sigs = [];
+    for (let before: string | undefined; ; ) {
+      const page = await conn.getSignaturesForAddress(address58, { until, before });
+      sigs.push(...page);
+      if (page.length < 1000) break;
+      before = page.at(-1)?.signature;
+    }
+    sigs.reverse();
+    for (const { signature } of sigs.filter((s) => !s.err)) {
       const t = await conn.getParsedTransaction(signature, { maxSupportedTransactionVersion: 0 });
       if (t) apply(toTx(signature, t));
       db.run("INSERT INTO cursor VALUES (?, ?) ON CONFLICT(address) DO UPDATE SET signature = excluded.signature", [

@@ -49,7 +49,12 @@ const cards: Card[] = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tsamara: sovereign sukuk for everyone</title>
     <meta name="description" content="Tokenized sovereign sukuk on Solana. Buy from $10 in USDC, trade any time, receive distributions onchain. Devnet prototype." />
-    <link rel="icon" href="data:," />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0b1110" />
   </head>
   <body>
     <main class="site-shell">
@@ -59,7 +64,10 @@ const cards: Card[] = [
             <img class="scene-img sky-img" src={`${scene}/16b5007d9c93971e26ffe4e0e3e37946f6bd538c.png`} alt="" />
 
             <header class="site-header" aria-label="Primary navigation">
-              <a class="site-logo" href="#cinema">Tsamara</a>
+              <a class="site-logo" href="#cinema">
+                <img src="/android-chrome-192x192.png" width="32" height="32" alt="" />
+                <span>Tsamara</span>
+              </a>
               <nav class="site-nav" aria-label="Main menu">
                 <a href="#cinema">Intro</a>
                 <a href={REPO}>GitHub</a>

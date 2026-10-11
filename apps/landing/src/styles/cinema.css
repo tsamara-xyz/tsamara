@@ -146,6 +146,12 @@ button {
   color: rgba(253, 241, 225, 0.92);
   text-decoration: none;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.site-logo img {
+  border-radius: 8px;
 }
 .site-nav {
   display: flex;

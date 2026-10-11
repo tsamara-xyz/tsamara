@@ -14,6 +14,7 @@
     "test": "bun test",
     "demo": "bun apps/devnet-demo/lifecycle.ts",
     "api": "bun apps/api/index.ts",
+    "app": "bun run --cwd apps/app dev",
     "indexer": "cargo run --release --manifest-path apps/indexer/Cargo.toml --"
   },
   "devDependencies": {

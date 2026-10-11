@@ -9,12 +9,21 @@ import { Keypair } from "@solana/web3.js";
 import { chromium, type Page } from "playwright-core";
 
 const APP = process.env.APP ?? "http://localhost:3000";
-const INDEXER = process.env.INDEXER ?? "http://localhost:8787";
+const API = process.env.API ?? "http://localhost:8788";
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? "";
 const SLOW = { timeout: 90_000 }; // devnet confirmations plus public-RPC rate limits
 
 const notice = (page: Page, text: string) => page.locator(".notice", { hasText: text }).waitFor(SLOW);
 const step = (message: string) => console.log(`  ✓ ${message}`);
+
+async function call(path: string, body: unknown, headers: Record<string, string> = {}) {
+  const res = await fetch(API + path, {
+    method: "POST",
+    headers: { "content-type": "application/json", ...headers },
+    body: JSON.stringify(body),
+  });
+  assert.ok(res.ok, `${path} failed: ${await res.text()}`);
+}
 
 const browser = await chromium.launch({ channel: "chrome", headless: process.env.HEADED !== "1" });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -52,24 +61,21 @@ try {
   step("subscribed to 10 units");
 
   await page.getByRole("link", { name: "Portfolio" }).click();
-  await page.locator(".big", { hasText: "$100.00" }).waitFor(SLOW);
-  await page.getByRole("cell", { name: "GSD31" }).waitFor();
-  step("portfolio shows $100.00 across 10 units");
+  const holding = page.locator(".tile.sukuk");
+  await holding.filter({ hasText: "10 units" }).filter({ hasText: "$100.00" }).waitFor(SLOW);
+  await page.locator(".figure", { hasText: "$1,000" }).first().waitFor();
+  step("portfolio shows 10 units worth $100.00 and $1,000.00 in total");
 
-  // Send one unit to another approved investor that has room under the cap.
-  const holders = (await (await fetch(`${INDEXER}/holders`)).json()) as {
-    wallet: string;
-    units: string;
-    approved: number;
-  }[];
-  const recipient = holders.find((h) => h.wallet !== address && h.approved === 1 && Number(h.units) < 90);
-  assert.ok(recipient, "another approved investor exists to receive a transfer");
-  await page.getByRole("link", { name: "Trade" }).click();
+  // A second approved investor to receive a transfer, set up through the API.
+  const recipient = Keypair.generate().publicKey.toBase58();
+  await call("/faucet", { wallet: recipient });
+  await call("/admin/kyc", { wallet: recipient, jurisdiction: "DE" }, { "x-admin-token": ADMIN_TOKEN });
+  await holding.click();
   await page.getByRole("button", { name: "Send" }).first().click();
-  await page.getByPlaceholder("Registered investor's address").fill(recipient.wallet);
+  await page.getByPlaceholder("Registered investor's address").fill(recipient);
   await page.locator('form button[type="submit"]').click();
   await notice(page, "Transfer settled");
-  step(`transferred 1 unit to ${recipient.wallet}`);
+  step(`transferred 1 unit to ${recipient}`);
 
   // A transfer to a wallet that never passed KYC must be explained, not shown as a raw program error.
   await page.getByPlaceholder("Registered investor's address").fill(Keypair.generate().publicKey.toBase58());

@@ -38,7 +38,7 @@ packages/sukuk       Instruction builders: issuance, KYC, settlement, distributi
 apps/devnet-demo     End-to-end lifecycle on devnet, also the integration check
 apps/indexer         Rust indexer on the Carbon framework: holders and events in SQLite, served over HTTP
 apps/api             Operator API (Hono): co-signs subscriptions, approves investors, pays distributions
-apps/app             Web app for app.tsamara.xyz (React + Vite): investor and operator views
+apps/app             Web app for app.tsamara.xyz (Next.js + TanStack Query and Table): explore, asset, portfolio, operator
 apps/landing         Landing page for tsamara.xyz (Astro)
 ```
 
@@ -81,7 +81,7 @@ KYC runs through [Sumsub](https://sumsub.com) when `SUMSUB_TOKEN` and `SUMSUB_SE
 With both running, start the web app:
 
 ```sh
-bun run app        # http://localhost:5173
+bun run app        # http://localhost:3000
 ```
 
 Use the built-in test wallet, or Phantom switched to devnet. Request test dollars, approve your address from the Operator tab with the admin token, then subscribe and transfer.

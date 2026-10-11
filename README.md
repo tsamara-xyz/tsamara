@@ -99,6 +99,7 @@ Use the built-in test wallet, or Phantom switched to devnet. Request test dollar
 | Indexer, unit (Rust) | Event classification and exactly-once storage | `cargo test --manifest-path apps/indexer/Cargo.toml` |
 | App, unit and regression | Derived figures, error explanations, request shape (a past CORS bug) | `bun test apps/app` |
 | End to end, devnet | Full lifecycle with assertions; API flow including Sumsub | `bun run demo`, `bun apps/api/smoke.ts` |
+| End to end, browser | A real Chrome drives the app against devnet: connect, fund, operator approval, subscribe, portfolio, transfer, and a refused transfer; a second script checks the Sumsub widget opens | `bun apps/app/e2e/investor-flow.ts`, `bun apps/app/e2e/kyc-dialog.ts` |
 
 `bun test` runs every TypeScript suite and needs no network. The program tests load `contracts/tests/fixtures/tsamara_compliance.so`; run `bun run --cwd contracts build` after changing the program so they do not test a stale binary.
 

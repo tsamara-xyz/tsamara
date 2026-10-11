@@ -7,7 +7,6 @@ import {
   createAssociatedTokenAccountIdempotentInstruction,
   createMint,
   createMintToInstruction,
-  createTransferCheckedInstruction,
   getAccount,
   TOKEN_2022_PROGRAM_ID as T22,
   TOKEN_PROGRAM_ID,
@@ -23,15 +22,17 @@ import {
   type TransactionInstruction,
 } from "@solana/web3.js";
 import {
-  approveInvestorIx,
+  approveInvestorIxs,
   ata,
   distributionIxs,
+  initializeComplianceIx,
   issueSeriesIxs,
   type PaymentToken,
+  registerInvestorIx,
   type SeriesTerms,
-  SUKUK_DECIMALS,
   subscribeIxs,
   tradeIxs,
+  transferIx,
 } from "@tsamara/sukuk";
 
 const conn = new Connection(process.env.RPC ?? "https://api.devnet.solana.com", "confirmed");
@@ -49,6 +50,7 @@ const terms: SeriesTerms = {
   paymentsPerYear: 2,
   unitValue: 10n * USD,
   restrictedJurisdictions: ["US"],
+  maxHolding: 100n,
 };
 
 // Devnet-only keys, persisted so reruns reuse the same funded issuer.
@@ -112,7 +114,18 @@ async function main() {
     }),
     [issuer, sukuk],
   );
-  console.log("1. Sukuk series issued:", sukuk.publicKey.toBase58(), "\n  ", link(s1));
+  await send(
+    [
+      initializeComplianceIx({
+        payer: issuer.publicKey,
+        compliance: compliance.publicKey,
+        mint: sukuk.publicKey,
+        terms,
+      }),
+    ],
+    [issuer, compliance],
+  );
+  console.log("1. Sukuk series issued with compliance rules:", sukuk.publicKey.toBase58(), "\n  ", link(s1));
 
   // Open everyone's accounts and give investors $5,000 each.
   const everyone = [issuer, amira, lukas, stranger];
@@ -151,27 +164,31 @@ async function main() {
   );
 
   // 2. KYC: only the compliance authority can approve investors, and only in jurisdictions where the series is offered.
-  const investors = [
+  const [amiraKyc, lukasKyc] = [
     { wallet: amira.publicKey, jurisdiction: "AE" },
     { wallet: lukas.publicKey, jurisdiction: "DE" },
   ];
-  const asIssuer = send([approveInvestorIx(sukuk.publicKey, investors[0]!, issuer.publicKey, terms)], [issuer]);
-  await assert.rejects(asIssuer, "issuer key was able to approve an investor");
-  assert.throws(
-    () =>
-      approveInvestorIx(
-        sukuk.publicKey,
-        { wallet: stranger.publicKey, jurisdiction: "US" },
-        compliance.publicKey,
-        terms,
-      ),
-    /not offered/,
-  );
-  await send(
-    investors.map((i) => approveInvestorIx(sukuk.publicKey, i, compliance.publicKey, terms)),
-    [issuer, compliance],
-  );
-  console.log("2. KYC approved for Amira (AE) and Lukas (DE); issuer key and US resident refused");
+  const approve = (investor: typeof amiraKyc, signer: Keypair) =>
+    approveInvestorIxs({
+      sukukMint: sukuk.publicKey,
+      investor,
+      payer: issuer.publicKey,
+      compliance: signer.publicKey,
+      terms,
+    });
+  await assert.rejects(send(approve(amiraKyc, issuer), [issuer]), "issuer key was able to approve an investor");
+  // The compliance program itself refuses a US resident, even when the client-side check is skipped.
+  const us = { wallet: stranger.publicKey, jurisdiction: "US" };
+  assert.throws(() => approve(us, compliance), /not offered/);
+  const registerUs = registerInvestorIx({
+    payer: issuer.publicKey,
+    compliance: compliance.publicKey,
+    mint: sukuk.publicKey,
+    investor: us,
+  });
+  await assert.rejects(send([registerUs], [issuer, compliance]), /RestrictedJurisdiction|0x1772/);
+  await send([...approve(amiraKyc, compliance), ...approve(lukasKyc, compliance)], [issuer, compliance]);
+  console.log("2. KYC approved for Amira (AE) and Lukas (DE); issuer key and US resident refused onchain");
 
   // 3. Primary subscription: Amira pays $1,000 and receives 100 units in the same transaction.
   const s3 = await send(
@@ -191,7 +208,7 @@ async function main() {
 
   // 4. Secondary trade: Amira sells 40 units to Lukas at par.
   const s4 = await send(
-    tradeIxs({
+    await tradeIxs(conn, {
       sukukMint: sukuk.publicKey,
       payment: usdc,
       seller: amira.publicKey,
@@ -206,27 +223,8 @@ async function main() {
   console.log("4. Amira sold 40 units to Lukas for $400.00, settled in one transaction\n  ", link(s4));
 
   // 5. A transfer to a wallet without KYC must be rejected by the token program itself.
-  let rejected = false;
-  try {
-    await send(
-      [
-        createTransferCheckedInstruction(
-          ata(sukuk.publicKey, amira.publicKey),
-          sukuk.publicKey,
-          ata(sukuk.publicKey, stranger.publicKey),
-          amira.publicKey,
-          10,
-          SUKUK_DECIMALS,
-          [],
-          T22,
-        ),
-      ],
-      [amira],
-    );
-  } catch (e) {
-    rejected = /frozen|0x11/i.test(String((e as { logs?: string[] })?.logs ?? e));
-  }
-  assert.ok(rejected, "transfer to a non-KYC wallet was NOT rejected");
+  const toStranger = await transferIx(conn, sukuk.publicKey, amira.publicKey, stranger.publicKey, 10n);
+  await assert.rejects(send([toStranger], [amira]), /frozen|0x11/i);
   assert.equal(await bal(sukuk.publicKey, stranger.publicKey), 0n);
   console.log("5. Transfer to non-KYC wallet rejected onchain (account frozen)");
 
@@ -244,6 +242,28 @@ async function main() {
   );
   for (const [i, k] of holders.entries()) assert.equal(await usdcBal(k.publicKey), before[i]! + payouts[i]!.amount);
   console.log(`6. Distribution paid: Amira ${usd(payouts[0]!.amount)}, Lukas ${usd(payouts[1]!.amount)}\n  `, link(s6));
+
+  // 7. Holding cap: Lukas tops up to 90 units, so receiving 20 more would exceed the 100-unit cap.
+  await send(
+    subscribeIxs({
+      sukukMint: sukuk.publicKey,
+      payment: usdc,
+      issuer: issuer.publicKey,
+      investor: lukas.publicKey,
+      units: 50n,
+      terms,
+    }),
+    [issuer, lukas],
+  );
+  const overCap = await transferIx(conn, sukuk.publicKey, amira.publicKey, lukas.publicKey, 20n);
+  await assert.rejects(send([overCap], [amira]), /HoldingCapExceeded|0x1773/);
+  const atCap = await transferIx(conn, sukuk.publicKey, amira.publicKey, lukas.publicKey, 10n);
+  const s7 = await send([atCap], [amira]);
+  assert.equal(await bal(sukuk.publicKey, lukas.publicKey), 100n);
+  console.log(
+    "7. Transfer above the 100-unit cap rejected by the compliance program; a transfer up to the cap succeeded\n  ",
+    link(s7),
+  );
 
   // Let the indexer and app find this run.
   writeFileSync(

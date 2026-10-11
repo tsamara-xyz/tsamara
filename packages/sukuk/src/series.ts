@@ -18,3 +18,7 @@ export const termsToFields = (t: SeriesTerms): [string, string][] => [
   ["imbalan_bps", String(t.imbalanBps)],
   ["unit_idr", String(t.unitRupiah)],
 ];
+
+/** Rupiah owed for one month on `units` tokens, rounded down. */
+export const monthlyImbalan = (units: bigint, t: SeriesTerms): bigint =>
+  (units * BigInt(t.unitRupiah) * BigInt(t.imbalanBps)) / (10_000n * 12n);

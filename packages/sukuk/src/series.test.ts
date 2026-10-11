@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { periodicDistribution, termsToFields, type SeriesTerms } from "./series";
+import { isEligible, periodicDistribution, termsToFields, type SeriesTerms } from "./series";
 
 // $10 units, 5.20% p.a., semiannual, paid in a 6-decimal dollar token.
 const terms: SeriesTerms = {
@@ -11,6 +11,7 @@ const terms: SeriesTerms = {
   profitRateBps: 520,
   paymentsPerYear: 2,
   unitValue: 10_000_000n,
+  restrictedJurisdictions: ["US"],
 };
 
 test("periodic distribution is pro rata", () => {
@@ -31,5 +32,12 @@ test("terms are serialised as onchain metadata fields", () => {
     profit_rate_bps: "520",
     payments_per_year: "2",
     unit_value: "10000000",
+    restricted_jurisdictions: "US",
   });
+});
+
+test("residents of restricted jurisdictions are not eligible", () => {
+  expect(isEligible("AE", terms)).toBe(true);
+  expect(isEligible("US", terms)).toBe(false);
+  expect(isEligible("us", terms)).toBe(false);
 });

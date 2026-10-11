@@ -57,23 +57,37 @@ function TopNav() {
 function Footer() {
   return (
     <footer>
-      <p>
-        <strong>Tsamara</strong> © 2026 · <a href="https://tsamara.xyz">tsamara.xyz</a> ·{" "}
+      <div className="footer-bar">
+        <strong>Tsamara © 2026</strong>
+        <a href="https://tsamara.xyz">tsamara.xyz</a>
         <a href="https://github.com/tsamara-xyz/tsamara/blob/main/docs/COMPLIANCE.md" target="_blank" rel="noreferrer">
           Compliance mapping
         </a>
-      </p>
-      <p>
-        Tsamara is a prototype running on Solana devnet with a mock sukuk series and test dollars that have no value.
-        Nothing on this site is an offer or solicitation to buy or sell securities, and no investment can be made here.
-        Tsamara holds no licence, has no regulatory approval and no sharia certification, and is not affiliated with any
-        sovereign issuer. A real offering would be limited to eligible investors in jurisdictions where it is
-        authorised.
-      </p>
-      <p>
-        Identity verification runs in Sumsub's sandbox. The compliance program is unaudited. Series marked Preview are
-        illustrations: they are not issued, not onchain and cannot be bought.
-      </p>
+        <a href="https://github.com/tsamara-xyz/tsamara/blob/main/docs/REGULATION.md" target="_blank" rel="noreferrer">
+          Regulatory notes
+        </a>
+        <a className="footer-end" href="https://github.com/tsamara-xyz/tsamara" target="_blank" rel="noreferrer">
+          GitHub ↗
+        </a>
+      </div>
+      <div className="disclaimer">
+        <p>
+          Tsamara is a prototype running on Solana devnet with a mock sukuk series and test dollars that have no value.
+          Nothing on this site is an offer or solicitation to buy or sell securities, and no investment can be made
+          here. Tsamara holds no licence, has no regulatory approval and no sharia certification, and is not affiliated
+          with any sovereign issuer.
+        </p>
+        <p>
+          A real offering would be limited to eligible investors in jurisdictions where it is authorised. The demo
+          series is not offered to residents of the United States or Indonesia. A unit in a real series would be a
+          beneficial share in sukuk held on trust; the token in this prototype represents nothing.
+        </p>
+        <p>
+          The expected profit rate is an expectation set by the structure, not a guarantee. Identity verification runs
+          in Sumsub's sandbox. The compliance program is unaudited. Series marked Preview are illustrations: they are
+          not issued, not onchain and cannot be bought.
+        </p>
+      </div>
     </footer>
   );
 }

@@ -17,6 +17,7 @@ import {
   DEMO_SERIES,
   initializeComplianceIx,
   issueSeriesIxs,
+  publishTermsIxs,
   type SeriesTerms,
   transferIx,
 } from "@tsamara/sukuk";
@@ -84,6 +85,7 @@ export class World {
       }),
       [issuer, mint],
     );
+    this.send(publishTermsIxs(issuer.publicKey, mint.publicKey, terms), [issuer]);
   }
 
   initCompliance(signer = this.compliance): void {

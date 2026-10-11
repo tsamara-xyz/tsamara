@@ -10,7 +10,13 @@ import {
   Transaction,
   type TransactionInstruction,
 } from "@solana/web3.js";
-import { DEMO_SERIES, initializeComplianceIx, issueSeriesIxs, type PaymentToken } from "@tsamara/sukuk";
+import {
+  DEMO_SERIES,
+  initializeComplianceIx,
+  issueSeriesIxs,
+  type PaymentToken,
+  publishTermsIxs,
+} from "@tsamara/sukuk";
 
 export const conn = new Connection(process.env.RPC ?? "https://api.devnet.solana.com", "confirmed");
 export const terms = DEMO_SERIES;
@@ -44,6 +50,7 @@ async function createSeries() {
     }),
     [issuer, mint],
   );
+  await send(publishTermsIxs(issuer.publicKey, mint.publicKey, terms), [issuer]);
   await send(
     [
       initializeComplianceIx({

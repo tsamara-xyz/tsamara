@@ -12,6 +12,7 @@ const terms: SeriesTerms = {
   paymentsPerYear: 2,
   unitValue: 10_000_000n,
   restrictedJurisdictions: ["US"],
+  maxHolding: 100n,
 };
 
 test("periodic distribution is pro rata", () => {
@@ -33,6 +34,7 @@ test("terms are serialised as onchain metadata fields", () => {
     payments_per_year: "2",
     unit_value: "10000000",
     restricted_jurisdictions: "US",
+    max_holding: "100",
   });
 });
 

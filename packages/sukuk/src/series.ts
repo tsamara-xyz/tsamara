@@ -16,6 +16,8 @@ export interface SeriesTerms {
   unitValue: bigint;
   /** ISO 3166-1 alpha-2 codes of jurisdictions whose residents may not hold this series, e.g. ["US"]. */
   restrictedJurisdictions: string[];
+  /** Maximum units one investor may hold, enforced onchain on every transfer. */
+  maxHolding: bigint;
 }
 
 export const termsToFields = (t: SeriesTerms): [string, string][] => [
@@ -26,6 +28,7 @@ export const termsToFields = (t: SeriesTerms): [string, string][] => [
   ["payments_per_year", String(t.paymentsPerYear)],
   ["unit_value", String(t.unitValue)],
   ["restricted_jurisdictions", t.restrictedJurisdictions.join(",")],
+  ["max_holding", String(t.maxHolding)],
 ];
 
 export const isEligible = (jurisdiction: string, t: SeriesTerms): boolean =>

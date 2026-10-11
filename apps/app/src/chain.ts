@@ -12,6 +12,7 @@ export interface Series {
   paymentDecimals: number;
   issuer: string;
   complianceProgram: string;
+  kyc: "sumsub" | "manual";
   terms: {
     name: string;
     symbol: string;
@@ -45,7 +46,11 @@ export interface Holder {
 async function request<T>(base: string, path: string, body?: unknown, adminToken?: string): Promise<T> {
   const res = await fetch(base + path, {
     method: body ? "POST" : "GET",
-    headers: { "content-type": "application/json", ...(adminToken ? { "x-admin-token": adminToken } : {}) },
+    // No content-type on GET: it would turn a simple request into a CORS preflight, which the indexer does not answer.
+    headers: {
+      ...(body ? { "content-type": "application/json" } : {}),
+      ...(adminToken ? { "x-admin-token": adminToken } : {}),
+    },
     body: body ? JSON.stringify(body) : undefined,
   }).catch(() => {
     throw new Error(`Cannot reach ${base}. Is the service running?`);
@@ -60,6 +65,16 @@ export const api = {
   investor: (wallet: string) => request<{ registered: boolean; units: string }>(API, `/investors/${wallet}`),
   faucet: (wallet: string) => request<{ signature: string }>(API, "/faucet", { wallet }),
   subscribe: (wallet: string, units: number) => request<{ transaction: string }>(API, "/subscribe", { wallet, units }),
+  kycToken: (wallet: string) => request<{ token: string }>(API, "/kyc/token", { wallet }),
+  kycComplete: (wallet: string) =>
+    request<{
+      status: "pending" | "approved" | "rejected";
+      jurisdiction?: string;
+      reason?: string;
+      signature?: string;
+    }>(API, "/kyc/complete", { wallet }),
+  sandboxReview: (token: string, wallet: string) =>
+    request<{ reviewAnswer: string }>(API, "/admin/kyc/sandbox-review", { wallet }, token),
   kyc: (token: string, wallet: string, jurisdiction: string) =>
     request<{ signature: string }>(API, "/admin/kyc", { wallet, jurisdiction }, token),
   distribute: (token: string) =>

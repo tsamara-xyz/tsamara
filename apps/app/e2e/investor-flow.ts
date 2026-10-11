@@ -4,6 +4,7 @@
 //   SUMSUB_TOKEN= SUMSUB_SECRET= ADMIN_TOKEN=e2e bun run api
 //   bun run --cwd apps/app build && bun run --cwd apps/app start
 //   ADMIN_TOKEN=e2e bun apps/app/e2e/investor-flow.ts
+// Add RECORD=<directory> to save a video of the run.
 import assert from "node:assert";
 import { Keypair } from "@solana/web3.js";
 import { chromium, type Page } from "playwright-core";
@@ -25,8 +26,18 @@ async function call(path: string, body: unknown, headers: Record<string, string>
   assert.ok(res.ok, `${path} failed: ${await res.text()}`);
 }
 
-const browser = await chromium.launch({ channel: "chrome", headless: process.env.HEADED !== "1" });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+// RECORD=<directory> saves a video of the run, slowed down enough to follow; useful as raw footage for a demo.
+const RECORD = process.env.RECORD;
+const browser = await chromium.launch({
+  channel: "chrome",
+  headless: process.env.HEADED !== "1",
+  slowMo: RECORD ? 700 : 0,
+});
+const context = await browser.newContext({
+  viewport: { width: 1440, height: 900 },
+  ...(RECORD ? { recordVideo: { dir: RECORD, size: { width: 1440, height: 900 } } } : {}),
+});
+const page = await context.newPage();
 const failures: string[] = [];
 page.on("pageerror", (e) => failures.push(`page error: ${e.message}`));
 
@@ -91,5 +102,7 @@ try {
   console.error(failures.join("\n"));
   throw e;
 } finally {
+  await context.close();
   await browser.close();
+  if (RECORD) console.log(`Video saved to ${await page.video()?.path()}`);
 }

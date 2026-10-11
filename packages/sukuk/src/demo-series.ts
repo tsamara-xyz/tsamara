@@ -7,9 +7,13 @@ export const DEMO_SERIES: SeriesTerms = {
   akad: "Wakalah",
   maturity: "2031-10-10",
   currency: "USD",
-  profitRateBps: 520,
+  expectedProfitRateBps: 520,
   paymentsPerYear: 2,
   unitValue: 10_000_000n, // $10 in a 6-decimal token
-  restrictedJurisdictions: ["US"],
+  // US: no registration or exemption in place. ID: the rupiah is mandatory for domestic transactions,
+  // so a dollar-stablecoin series cannot be settled with Indonesian residents.
+  restrictedJurisdictions: ["US", "ID"],
   maxHolding: 100n,
+  tangibleAssetsBps: 5_100,
+  tangibilityAsOf: "2026-10-01",
 };

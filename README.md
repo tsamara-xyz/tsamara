@@ -37,6 +37,8 @@ contracts            Anchor program: transfer hook, series rules, investor regis
 packages/sukuk       Instruction builders: issuance, KYC, settlement, distribution
 apps/devnet-demo     End-to-end lifecycle on devnet, also the integration check
 apps/indexer         Rust indexer on the Carbon framework: holders and events in SQLite, served over HTTP
+apps/api             Operator API (Hono): co-signs subscriptions, approves investors, pays distributions
+apps/landing         Landing page for tsamara.xyz (Astro)
 ```
 
 ## Run it
@@ -62,6 +64,16 @@ cargo test --manifest-path apps/indexer/Cargo.toml
 ```
 
 It reads from `RPC` (default `https://api.devnet.solana.com`) and stores to `.data/indexer-<SUKUK_MINT>.db`. `GET /events?wallet=<address>` returns one wallet's history.
+
+The operator API holds the issuer and compliance keys (devnet files under `.keys/`) and creates a live series on first start. It reads holders from the indexer, so run both.
+
+```sh
+bun run indexer                                   # terminal 1
+ADMIN_TOKEN=change-me bun run api                 # terminal 2, serves on API_PORT (default 8788)
+ADMIN_TOKEN=change-me bun apps/api/smoke.ts       # faucet -> KYC -> subscribe -> distribute, with assertions
+```
+
+Routes under `/admin` (KYC approval, distributions) require the `x-admin-token` header.
 
 ## Status
 

@@ -21,12 +21,15 @@ import {
 export const conn = new Connection(process.env.RPC ?? "https://api.devnet.solana.com", "confirmed");
 export const terms = DEMO_SERIES;
 
-// ponytail: operator keys are devnet files on disk; on mainnet these are multisigs and this service only proposes transactions.
-const loadKey = (name: string) => {
+// ponytail: operator keys are devnet secrets in an env var or a file; on mainnet these are multisigs and this
+// service only proposes transactions.
+// A deployment passes each key as a JSON byte array (ISSUER_KEY, COMPLIANCE_KEY); locally they are files.
+const loadKey = (name: "issuer" | "compliance") => {
+  const fromEnv = process.env[`${name.toUpperCase()}_KEY`];
   const file = `.keys/${name}.json`;
-  if (!existsSync(file))
+  if (!fromEnv && !existsSync(file))
     throw new Error(`Missing ${file}. Run \`bun run demo\` once to create and fund the devnet keys.`);
-  return Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(file, "utf8"))));
+  return Keypair.fromSecretKey(Uint8Array.from(JSON.parse(fromEnv ?? readFileSync(file, "utf8"))));
 };
 export const issuer = loadKey("issuer");
 export const compliance = loadKey("compliance");
@@ -73,7 +76,12 @@ async function createSeries() {
   return series;
 }
 
-const saved = existsSync(FILE) ? JSON.parse(readFileSync(FILE, "utf8")) : await createSeries();
+// A deployment names its series with SUKUK_MINT and PAYMENT_MINT; locally it is created once and remembered.
+const fromEnv =
+  process.env.SUKUK_MINT && process.env.PAYMENT_MINT
+    ? { sukukMint: process.env.SUKUK_MINT, paymentMint: process.env.PAYMENT_MINT }
+    : null;
+const saved = fromEnv ?? (existsSync(FILE) ? JSON.parse(readFileSync(FILE, "utf8")) : await createSeries());
 export const sukukMint = new PublicKey(saved.sukukMint);
 export const payment: PaymentToken = {
   mint: new PublicKey(saved.paymentMint),

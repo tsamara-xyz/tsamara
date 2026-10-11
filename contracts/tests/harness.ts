@@ -15,6 +15,8 @@ import {
   ata,
   COMPLIANCE_PROGRAM_ID,
   DEMO_SERIES,
+  type ForcedTransferOrder,
+  forcedTransferIxs,
   initializeComplianceIx,
   issueSeriesIxs,
   publishTermsIxs,
@@ -161,6 +163,24 @@ export class World {
 
   async transfer(from: Keypair, to: Keypair, units: bigint): Promise<void> {
     this.send([await transferIx(this.conn, this.mint.publicKey, from.publicKey, to.publicKey, units)], [from]);
+  }
+
+  async forcedTransfer(
+    from: Keypair,
+    to: Keypair,
+    units: bigint,
+    order: ForcedTransferOrder,
+    signer = this.compliance,
+  ): Promise<void> {
+    const ixs = await forcedTransferIxs(this.conn, {
+      sukukMint: this.mint.publicKey,
+      from: from.publicKey,
+      to: to.publicKey,
+      units,
+      compliance: signer.publicKey,
+      order,
+    });
+    this.send(ixs, [signer]);
   }
 
   async units(wallet: Keypair): Promise<bigint> {

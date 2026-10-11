@@ -6,6 +6,7 @@ import { investorCount, outstandingSeries, outstandingUnits } from "@/lib/activi
 import { assetsFor, rate } from "@/lib/assets";
 import { explorer, short, usd } from "@/lib/chain";
 import { describe } from "../activity-table";
+import { AssetCard } from "../asset-card";
 import { SeriesTable } from "../series-table";
 import { useStore } from "../store";
 import { AssetIcon, Sparkline } from "../ui";
@@ -13,15 +14,19 @@ import { AssetIcon, Sparkline } from "../ui";
 export function ExplorePage() {
   const { series, holders, events, wallet, position, search: query } = useStore();
   const [tab, setTab] = useState<"all" | "live" | "preview">("all");
+  const [structure, setStructure] = useState("All structures");
+  const [view, setView] = useState<"list" | "grid">("list");
   if (!series) return <p className="muted pad">Loading series…</p>;
 
   const decimals = series.paymentDecimals;
   const chart = outstandingSeries(events);
   const outstanding = outstandingUnits(holders);
   const assets = assetsFor(series);
+  const structures = [...new Set(assets.map((a) => a.akad))];
   const shown = assets.filter(
     (a) =>
       (tab === "all" || (tab === "live") === a.live) &&
+      (structure === "All structures" || a.akad === structure) &&
       `${a.symbol} ${a.name} ${a.akad}`.toLowerCase().includes(query.trim().toLowerCase()),
   );
   const value = (position?.units ?? 0n) * BigInt(series.terms.unitValue);
@@ -135,10 +140,52 @@ export function ExplorePage() {
               <span className="tag">{assets.filter((a) => t === "all" || (t === "live") === a.live).length}</span>
             </button>
           ))}
+          <span className="status open tabs-end">Settles any time on devnet</span>
         </div>
-        <SeriesTable assets={shown} decimals={decimals} outstanding={outstanding} chart={chart} query={query} />
-        <p className="muted small pad">
-          Preview series illustrate the catalogue. They are not issued and cannot be bought.
+        <div className="filters">
+          {["All structures", ...structures].map((name) => (
+            <button
+              type="button"
+              key={name}
+              className={`chip ${structure === name ? "on" : ""}`}
+              onClick={() => setStructure(name)}
+            >
+              {name}
+            </button>
+          ))}
+          <fieldset className="view" aria-label="View">
+            <button
+              type="button"
+              className={view === "list" ? "on" : ""}
+              onClick={() => setView("list")}
+              aria-label="List view"
+            >
+              ☰
+            </button>
+            <button
+              type="button"
+              className={view === "grid" ? "on" : ""}
+              onClick={() => setView("grid")}
+              aria-label="Grid view"
+            >
+              ▦
+            </button>
+          </fieldset>
+        </div>
+        {view === "list" ? (
+          <SeriesTable assets={shown} decimals={decimals} outstanding={outstanding} chart={chart} query={query} />
+        ) : (
+          <div className="asset-grid pad">
+            {shown.map((asset) => (
+              <AssetCard key={asset.symbol} asset={asset} decimals={decimals} chart={chart} />
+            ))}
+          </div>
+        )}
+        <p className="muted small pad list-foot">
+          <span>
+            {shown.length === 0 ? "0" : `1–${shown.length}`} of {assets.length}
+          </span>
+          <span>Preview series illustrate the catalogue. They are not issued and cannot be bought.</span>
         </p>
       </section>
     </>

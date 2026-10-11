@@ -1,0 +1,13 @@
+**/node_modules
+**/target
+**/.next
+**/dist
+**/.astro
+.git
+.keys
+.data
+.env
+.env.*
+*.png
+!apps/**/public/*.png
+contracts/tests/fixtures

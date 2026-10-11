@@ -1,0 +1,110 @@
+# Regulatory and sharia notes
+
+What a real version of Tsamara would have to satisfy, and what follows for the design and for what we are allowed to say. Written in October 2026 from desk research, mostly through law-firm and press summaries rather than primary texts.
+
+This is not legal advice and not a fatwa. Items marked *unverified* were not confirmed against a primary source. Everything here needs review by counsel and a sharia board before it is relied on.
+
+## The short version
+
+- No regime today lets an unlicensed team sell a $10 repackaged sovereign-sukuk token to retail investors "globally". A realistic first issuance is for professional investors, from one licensed venue or sandbox.
+- Tsamara cannot issue a sovereign sukuk. It could only issue its own instrument that holds one, so a holder's claim would be on that vehicle, not on the sovereign.
+- For the token to be a sukuk in the sharia sense, it must represent an undivided beneficial share in the underlying sukuk held on trust, not a debt claim on a vehicle.
+- Trading at a negotiated price is only defensible while the underlying is majority tangible assets.
+
+## Legal characterisation
+
+A tokenized claim on a sovereign sukuk is a security or debt instrument in every regime surveyed. It is not e-money, and it is outside the EU's MiCA regime, which excludes financial instruments. US securities staff said in January 2026 that tokenized securities are treated like traditional ones.
+
+| Structure | Holder's claim | Used by |
+|---|---|---|
+| Native issuance by the sovereign's own issuer | Direct | Hong Kong tokenized green bonds; Khazanah's tokenized sukuk pilot (Malaysia, 2026) |
+| Note from a special-purpose vehicle that holds the asset | Indirect, with vehicle and custodian insolvency risk | Ondo USDY (non-US investors only), Backed |
+| Fund units | Indirect | BlackRock BUIDL (qualified purchasers), Franklin BENJI (a registered US fund open to retail) |
+
+Indonesia: under Law 19/2008 only the Government or a state sukuk issuing company may issue SBSN, and unauthorised issuance is a criminal offence. Indonesia's global sukuk are issued as Reg S / 144A trust certificates by Perusahaan Penerbit SBSN Indonesia III. Pricing supplements from 2013 and 2018 set denominations of US$200,000 and multiples of US$1,000; the current programme's terms are *unverified*.
+
+## What an offer requires
+
+| Jurisdiction | Retail possible? | Notes |
+|---|---|---|
+| United States | Only with registration | Otherwise accredited investors (Reg D) or non-US persons (Reg S). The holding vehicle risks being an investment company. The September 2026 "innovation exemption" covers secondary trading of tokenized listed stocks only |
+| European Union | Only with a prospectus | MiFID II and the Prospectus Regulation apply. Exempt below €12m per 12 months from June 2026; member states may set €5m |
+| United Kingdom | Only through an approved financial promotion | Digital Securities Sandbox open to admitted firms |
+| Singapore | Only with a prospectus | Exemptions for small offers, private placements, institutional and accredited investors |
+| Hong Kong | Only through authorised products or a prospectus | 2026 circulars allow secondary trading on licensed platforms |
+| UAE | Not established | A tokenized sukuk is a security; DFSA and ADGM run sandboxes |
+| Malaysia | Not yet | Pilot-led; retail fractional sukuk is an aspiration |
+| Indonesia | Not yet | Offering tokenized assets is covered by a draft rule, still a draft in October 2026. A public offer needs a registration with OJK. Sandbox pilots exist |
+
+## Consequences for the mechanics
+
+| Mechanic | Position |
+|---|---|
+| Jurisdiction list, freeze until approved, holding cap | The same controls live products use. They are evidence of compliance, not a licence |
+| Transfers between approved wallets | A bilateral transfer is not a trading venue. An order book or matching service would be, and needs a licence |
+| Register of holders | A registrar is required, with personal data kept offchain |
+| Stablecoin settlement | Depends on the jurisdiction. In Indonesia the rupiah is mandatory for domestic transactions, so stablecoin subscriptions and distributions for Indonesian residents are not permitted |
+| Travel Rule, sanctions, tax | FATF Recommendation 16 applies between service providers. Sanctions screening is expected. Withholding and FATCA/CRS treatment are *unverified* |
+
+## Sharia position
+
+| Topic | Position | Status |
+|---|---|---|
+| What a sukuk is | Certificates of equal value representing undivided shares in assets, usufruct or services; not a debt claim (AAOIFI Sharia Standard 17) | Settled |
+| Asset-based or asset-backed | Most sovereign sukuk are asset-based: holders have a beneficial interest and recourse to the obligor, not a true sale | Market practice, criticised |
+| Tradability | Ijarah, or wakalah with majority tangible assets, may trade at any agreed price. Debt-dominant pools trade at par only | Settled across AAOIFI, OIC Fiqh Academy and DSN-MUI |
+| Tangibility | Above 50% throughout the tenor; below 33% the sukuk trades under debt rules (AAOIFI Standard 59). DSN-MUI Fatwa 95/2014 requires at least 51% tangible assets for a tradable SBSN wakalah | Settled |
+| A fixed distribution | In ijarah it is rental. In wakalah it is an expected profit rate, with any excess paid to the agent as an incentive; a shortfall may be covered by a reserve, not by the agent's guarantee | Settled in principle |
+| Purchase undertaking at face value | Prohibited for an agent by AAOIFI's 2008 resolution, widespread in practice through the lessee route | Contested |
+| Draft AAOIFI Standard 62 | Would require actual legal transfer of the assets to holders. Put on hold in November 2025; no adoption found | Unsettled |
+| Tokenization | No AAOIFI or IFSB standard found. Malaysia's Shariah Advisory Council treats a token's status as following the rights attached to it. No DSN-MUI fatwa on sukuk tokenization found | Open |
+| Stablecoin settlement | No authoritative ruling found. Paying for an asset-majority sukuk is a sale, not a currency exchange | Open |
+| Freezing and forced transfer | Freezing is defensible as a disclosed condition. A forced transfer without due process or compensation risks being usurpation | Our analysis |
+
+Indonesia's 2021 Ijtima Ulama ruled crypto impermissible as currency, and valid as an asset only with a clear underlying and benefit. A general DSN-MUI fatwa on crypto assets was still pending in August 2026.
+
+## What this changes in the design
+
+Tracked as issues; none of it is built.
+
+1. Model a series on ijarah, or on wakalah with at least 51% tangible assets. Never murabaha.
+2. Publish onchain: the structure, the tangibility ratio with its as-of date, the purchase-undertaking terms, the record date, the fee schedule, the trustee, and the hash of the sharia pronouncement.
+3. Restrict transfers to par when tangibility falls below the threshold.
+4. Make the token a beneficial-ownership unit under a trust or wakalah arrangement, not a note.
+5. Give freezes and forced transfers a reason code and the authority that ordered them.
+6. Add a purification account for any non-compliant income.
+7. Keep avoiding the token standard's interest-bearing feature.
+
+## What we must not say
+
+| Do not say | Say instead |
+|---|---|
+| Compliant, regulated | Unlicensed devnet prototype; the controls are designed to support compliance |
+| Available globally, retail anywhere | A design target; a real launch would be for eligible investors in one jurisdiction |
+| Tokenized sovereign sukuk, backed by a government | A token that would represent a beneficial share in sovereign sukuk held on trust; no affiliation with any issuer |
+| Sharia-compliant, halal | Designed with sharia principles in mind; not reviewed or certified by any sharia board |
+| Coupon, interest, guaranteed or fixed return | Expected periodic distribution |
+| Asset-backed | Asset-based, unless there is a true sale |
+| Islamic bonds | Certificates of ownership in underlying assets |
+| Freely tradable at any price | Transferable at agreed prices while the underlying is majority tangible |
+| KYC makes transfers legal | KYC and whitelisting are necessary, not sufficient |
+| MiCA-compliant | Outside MiCA; securities law applies |
+
+## A realistic path
+
+Start with professional or accredited investors outside the United States, through a bankruptcy-remote vehicle in a jurisdiction with a tokenization sandbox (ADGM, DIFC or Singapore), with a licensed custodian, registrar and placement agent. Pursue Indonesia's regulatory sandbox in parallel for a rupiah-settled domestic version. Retail access at small unit sizes needs an approved prospectus, an authorised fund, or native issuance by a sovereign.
+
+## Sources
+
+- Indonesia Law 19/2008 on SBSN: https://jdih.kemenkeu.go.id/fulltext/2008/19TAHUN2008UU.htm
+- DSN-MUI Fatwa 95/2014, SBSN Wakalah: https://tafsirq.com/konten/dsn/surat-berharga-syariah-negara-sbsn-wakalah
+- AAOIFI on draft Standard 62: https://aaoifi.com/announcement/press-release-from-the-accounting-and-auditing-organisation-for-islamic-financial-institutions-aaoifi-regarding-draft-shariah-standard-no-62/?lang=en
+- OIC Fiqh Academy resolution 178: https://iifa-aifi.org/en/32984.html
+- SEC staff on tokenized securities: https://www.clearygottlieb.com/news-and-insights/publication-listing/sec-staff-issues-guidance-on-tokenized-security-taxonomies
+- SEC innovation exemption: https://www.sidley.com/en/insights/newsupdates/2026/09/sec-issues-innovation-exemption-for-onchain-trading-of-tokenized-us-listed-stocks
+- EU prospectus threshold: https://www.fsma.be/en/news/new-prospectus-threshold-offers-securities-public
+- MAS tokenisation guide: https://www.clydeco.com/es/insights/2025/12/guide-on-the-tokenisation-of-capital-market-produc
+- Hong Kong SFC 2026 framework: https://www.charlesrussellspeechlys.com/en/insights/expert-insights/financial-services/2026/hong-kong-sfc-launches-new-framework-for-secondary-trading-of-tokenised-investment-products/
+- OJK draft rule on tokenized assets: https://bcasekuritas.co.id/latest-news/news/ojk-rpojk-penawaran-aset-ditokenisasi-masa-depan-keuangan-digital
+- Khazanah tokenized sukuk pilot: https://www.ledgerinsights.com/malaysian-sovereign-fund-pilots-tokenized-sukuk-with-25m-issuance/
+- Indonesia global sukuk, 2021 pricing: https://www.bi.go.id/en/iru/highlight-news/Documents/Republic%20of%20Indonesia%20priced%20a%20US$%203%20billion%20Global%20Sukuk.pdf

@@ -3,6 +3,7 @@ import {
   createInitializeDefaultAccountStateInstruction,
   createInitializeMetadataPointerInstruction,
   createInitializeMintInstruction,
+  createInitializePermanentDelegateInstruction,
   createInitializeTransferHookInstruction,
   ExtensionType,
   getAssociatedTokenAddressSync,
@@ -47,6 +48,7 @@ export async function issueSeriesIxs(
     ExtensionType.MetadataPointer,
     ExtensionType.DefaultAccountState,
     ExtensionType.TransferHook,
+    ExtensionType.PermanentDelegate,
   ]);
   const metaLen =
     TYPE_SIZE +
@@ -64,6 +66,9 @@ export async function issueSeriesIxs(
     createInitializeDefaultAccountStateInstruction(mint, AccountState.Frozen, T22),
     // Every transfer calls the compliance program, which checks the recipient's record and the holding cap.
     createInitializeTransferHookInstruction(mint, compliance, COMPLIANCE_PROGRAM_ID, T22),
+    // Lets the compliance authority move units without the holder's signature. Meant for lost keys, inheritance
+    // and court or regulator orders only; see `forcedTransferIxs`.
+    createInitializePermanentDelegateInstruction(mint, compliance, T22),
     createInitializeMintInstruction(mint, SUKUK_DECIMALS, issuer, compliance, T22),
     createInitializeInstruction({
       programId: T22,

@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": { "includes": ["**", "!**/dist", "!**/.astro", "!**/target"] },
+  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 120 },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "style": { "noNonNullAssertion": "off" }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.astro"],
+      "linter": { "rules": { "correctness": { "noUnusedVariables": "off", "noUnusedImports": "off" } } }
+    }
+  ]
+}

@@ -2,15 +2,22 @@
   "name": "tsamara",
   "private": true,
   "type": "module",
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
+    "lint": "biome check .",
+    "format": "biome check --write .",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "demo": "bun apps/devnet-demo/lifecycle.ts",
     "indexer": "bun apps/indexer/index.ts"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
     "@types/bun": "latest",
+    "husky": "^9.1.7",
     "typescript": "^5"
   }
 }

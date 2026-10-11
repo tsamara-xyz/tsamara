@@ -1,0 +1,73 @@
+# Compliance mapping
+
+What a regulated sukuk offering needs, what Tsamara does about each item today, and what code cannot solve.
+
+This is an engineering document, not legal advice. Tsamara is a devnet prototype with a mock series: it holds no licence, has no regulatory approval and no sharia certification. The requirements below are the ones we designed against and must be validated with counsel and a sharia board for any real issuance.
+
+## Status key
+
+| Status | Meaning |
+|---|---|
+| Onchain | Enforced by a program; the operator cannot bypass it |
+| Tooling | Enforced by the operator API; depends on the operator behaving |
+| Designed | Decided and tracked as an issue, not built |
+| External | Needs a licence, a contract or a third party; not a software problem |
+
+## Investor eligibility and transfer restrictions
+
+| Requirement | Control | Status |
+|---|---|---|
+| Only identified investors hold the instrument | Token accounts are frozen by default; only the compliance authority can thaw one | Onchain |
+| A recipient must be a known investor | Transfer hook requires an investor record for the recipient on every transfer | Onchain |
+| Offering restrictions by jurisdiction | Restricted jurisdictions are stored in the series config; registration and every transfer check them | Onchain |
+| Per-investor holding limit on transfers | Transfer hook checks the recipient's balance after the transfer | Onchain |
+| Per-investor holding limit on primary subscription | The API checks the limit before the issuer co-signs; the hook does not run on mint ([#21](https://github.com/tsamara-xyz/tsamara/issues/21)) | Tooling |
+| Offboarding an investor | The compliance authority freezes the account | Onchain |
+| Identity verification and sanctions screening (KYC/AML) | None. The operator enters a wallet and a country code by hand | External |
+| Investor classification (retail, professional, accredited) | Not modelled | Designed |
+
+## Issuer controls and governance
+
+| Requirement | Control | Status |
+|---|---|---|
+| Separation of duties | Minting and investor approval are different keys; the demo asserts the issuer key cannot approve investors | Onchain |
+| No single key can act alone | Authorities held in a multisig ([#19](https://github.com/tsamara-xyz/tsamara/issues/19)) | Designed |
+| Recovery for lost keys, inheritance and court orders | Permanent delegate held by the multisig, every use logged ([#20](https://github.com/tsamara-xyz/tsamara/issues/20)) | Designed |
+| Changing series rules after issuance | No instruction to update the config; rules are fixed at initialization | Designed |
+| Operator access control | Admin routes require a shared token; keys are files on disk | Tooling |
+
+## Settlement, payments and records
+
+| Requirement | Control | Status |
+|---|---|---|
+| Delivery versus payment | Payment and delivery are instructions in one transaction | Onchain |
+| Public, tamper-evident terms | Akad, maturity, currency, profit rate, unit size, restrictions and holding cap are stored in the token's metadata | Onchain |
+| Audit trail | Every approval, subscription, transfer and distribution is a confirmed transaction; the indexer derives a per-wallet history from them | Onchain, read through tooling |
+| Accurate pro rata distributions | Integer math, rounded down, unit-tested; holders are read from the indexer | Tooling |
+| A distribution cannot be paid twice | Not guarded; a retry would pay again ([#23](https://github.com/tsamara-xyz/tsamara/issues/23)) | Designed |
+| Settlement asset | A mock dollar token on devnet; a real stablecoin on the same token program works without code changes | External |
+| Registry of record | The chain is the registry in this design; whether that is legally sufficient depends on the jurisdiction | External |
+
+## Sharia
+
+| Requirement | Control | Status |
+|---|---|---|
+| The underlying sukuk is sharia-compliant | Inherited from the real instrument; the demo series is a mock | External |
+| The tokenized structure preserves the holder's rights in the underlying asset | Depends on the legal wrapper between the token and the sukuk, which does not exist yet | External |
+| Sharia board review of the structure and of secondary trading | None | External |
+| Returns are profit distributions, not interest | The series models a fixed periodic distribution set by the akad; we deliberately do not use Token-2022's interest-bearing extension | Onchain |
+
+## Issuance and distribution
+
+| Requirement | Control | Status |
+|---|---|---|
+| Authority to issue or tokenize the instrument | None | External |
+| Licence to distribute to investors in each jurisdiction | None | External |
+| Custody of the underlying sukuk | None | External |
+| Disclosure documents and risk warnings | A prototype notice on every surface; no offering document | External |
+| Data protection | The chain stores a wallet address and a country code per investor, and no other personal data | Onchain |
+| Security review | The compliance program is unaudited ([#23](https://github.com/tsamara-xyz/tsamara/issues/23)) | External |
+
+## What this adds up to
+
+The parts of compliance that are rules about who may hold and transfer the instrument are enforced by programs. The parts that are about who the issuer is, whether investors are who they claim to be, and whether the structure is lawful and sharia-compliant are not software, and none of them are in place.

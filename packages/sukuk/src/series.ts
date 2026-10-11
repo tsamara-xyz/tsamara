@@ -14,6 +14,8 @@ export interface SeriesTerms {
   paymentsPerYear: number;
   /** Face value of one token, in base units of the payment token (USDC has 6 decimals). */
   unitValue: bigint;
+  /** ISO 3166-1 alpha-2 codes of jurisdictions whose residents may not hold this series, e.g. ["US"]. */
+  restrictedJurisdictions: string[];
 }
 
 export const termsToFields = (t: SeriesTerms): [string, string][] => [
@@ -23,7 +25,11 @@ export const termsToFields = (t: SeriesTerms): [string, string][] => [
   ["profit_rate_bps", String(t.profitRateBps)],
   ["payments_per_year", String(t.paymentsPerYear)],
   ["unit_value", String(t.unitValue)],
+  ["restricted_jurisdictions", t.restrictedJurisdictions.join(",")],
 ];
+
+export const isEligible = (jurisdiction: string, t: SeriesTerms): boolean =>
+  !t.restrictedJurisdictions.includes(jurisdiction.toUpperCase());
 
 /** Payment-token base units owed for one period on `units` tokens, rounded down. */
 export const periodicDistribution = (units: bigint, t: SeriesTerms): bigint =>

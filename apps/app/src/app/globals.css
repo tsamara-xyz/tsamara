@@ -407,6 +407,15 @@ code {
   text-align: left;
 }
 
+.sort {
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
 .table th.num {
   text-align: right;
 }

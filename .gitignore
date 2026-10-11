@@ -48,3 +48,7 @@ apps/indexer/target
 # next
 .next
 next-env.d.ts
+
+# e2e
+e2e-failure.png
+e2e-kyc-dialog.png

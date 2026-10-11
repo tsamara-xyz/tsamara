@@ -1,10 +1,10 @@
 // Operator-only routes, behind the admin token.
-import { distributionIxs } from "@tsamara/sukuk";
+import { distributionIxs, forcedTransferIxs } from "@tsamara/sukuk";
 import { Hono } from "hono";
-import { fail, json, parseWallet } from "../http";
+import { fail, json, parseUnits, parseWallet } from "../http";
 import { applicant, sandboxReview } from "../kyc";
 import { approveOnchain, holders } from "../ledger";
-import { issuer, payment, send, terms } from "../series";
+import { compliance, conn, issuer, payment, send, sukukMint, terms } from "../series";
 
 export function adminRoutes(adminToken: string): Hono {
   const admin = new Hono();
@@ -35,6 +35,23 @@ export function adminRoutes(adminToken: string): Hono {
     const { ixs, payouts } = distributionIxs(payment, issuer.publicKey, await holders(), terms);
     if (ixs.length === 0) fail(422, "No holders to pay");
     return c.json(json({ signature: await send(ixs, [issuer]), payouts }));
+  });
+
+  // Moves units without the holder's signature. For lost keys, inheritance and court or regulator orders;
+  // the reason and the ordering authority are written onchain with the transfer.
+  admin.post("/forced-transfer", async (c) => {
+    const body = await c.req.json();
+    const order = { reason: String(body.reason ?? ""), orderedBy: String(body.orderedBy ?? "") };
+    if (!order.reason.trim() || !order.orderedBy.trim()) fail(400, "reason and orderedBy are required");
+    const ixs = await forcedTransferIxs(conn, {
+      sukukMint,
+      from: parseWallet(body.from),
+      to: parseWallet(body.to),
+      units: parseUnits(body.units),
+      compliance: compliance.publicKey,
+      order,
+    });
+    return c.json({ signature: await send(ixs, [issuer, compliance]) });
   });
 
   return admin;

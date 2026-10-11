@@ -3,7 +3,7 @@ FROM node:22-slim AS build
 RUN npm install --global bun@1.3
 WORKDIR /repo
 COPY . .
-RUN bun install --frozen-lockfile && bun run --cwd apps/landing build
+RUN bun install --frozen-lockfile --filter '@tsamara/landing' && bun run --cwd apps/landing build
 
 FROM nginx:1.29-alpine
 COPY --from=build /repo/apps/landing/dist /usr/share/nginx/html

@@ -80,7 +80,9 @@ if ((await call("/series")).data.kyc === "sumsub") {
   const american = await verified("USA");
   assert.equal(american.result.status, 422, "a verified US resident must still be refused");
   assert.equal((await call(`/investors/${american.address}`)).data.registered, false);
-  console.log("Sumsub KYC check passed: DE approved onchain, US refused");
+  const indonesian = await verified("IDN");
+  assert.equal(indonesian.result.status, 422, "an Indonesian resident cannot be served by a dollar-stablecoin series");
+  console.log("Sumsub KYC check passed: DE approved onchain, US and ID refused");
 }
 
 console.log("API smoke check passed for", wallet);

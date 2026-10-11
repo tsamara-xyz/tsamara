@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { isEligible, periodicDistribution, termsToFields, type SeriesTerms } from "./series";
+import { isEligible, periodicDistribution, type SeriesTerms, termsToFields } from "./series";
 
 // $10 units, 5.20% p.a., semiannual, paid in a 6-decimal dollar token.
 const terms: SeriesTerms = {

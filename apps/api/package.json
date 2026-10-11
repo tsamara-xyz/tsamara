@@ -1,0 +1,11 @@
+{
+  "name": "@tsamara/api",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@solana/spl-token": "^0.4.15",
+    "@solana/web3.js": "^1.99.0",
+    "@tsamara/sukuk": "workspace:*",
+    "hono": "^4.13.13"
+  }
+}

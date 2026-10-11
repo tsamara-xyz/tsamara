@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "demo": "bun apps/devnet-demo/lifecycle.ts",
+    "api": "bun apps/api/index.ts",
     "indexer": "cargo run --release --manifest-path apps/indexer/Cargo.toml --"
   },
   "devDependencies": {

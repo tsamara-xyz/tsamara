@@ -3,9 +3,10 @@ import { type ChainEvent, explorer, short, usd } from "@/lib/chain";
 export function describe(e: ChainEvent, decimals: number): string {
   if (e.kind === "approved") return "Investor approved";
   if (e.kind === "revoked") return "Investor revoked";
-  if (e.kind === "subscription") return `Subscribed ${e.units} units for ${usd(e.amount, decimals)}`;
+  const units = `${e.units} ${e.units === "1" ? "unit" : "units"}`;
+  if (e.kind === "subscription") return `Subscribed ${units} for ${usd(e.amount, decimals)}`;
   if (e.kind === "distribution") return `Distribution of ${usd(e.amount, decimals)}`;
-  return `Transferred ${e.units} units`;
+  return `Transferred ${units}`;
 }
 
 export function Activity({ events, decimals, empty }: { events: ChainEvent[]; decimals: number; empty: string }) {

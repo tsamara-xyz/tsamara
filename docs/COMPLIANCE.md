@@ -33,7 +33,7 @@ This is an engineering document, not legal advice. The legal and sharia position
 |---|---|---|
 | Separation of duties | Minting and investor approval are different keys; the demo asserts the issuer key cannot approve investors | Onchain |
 | No single key can act alone | Authorities held in a multisig ([#19](https://github.com/tsamara-xyz/tsamara/issues/19)) | Designed |
-| Recovery for lost keys, inheritance and court orders | Permanent delegate held by the multisig, every use logged ([#20](https://github.com/tsamara-xyz/tsamara/issues/20)) | Designed |
+| Recovery for lost keys, inheritance and court orders | The compliance authority is the mint's permanent delegate and can move units without the holder's signature. The library refuses to build the transfer without a reason and an ordering authority, and writes both onchain as a memo; the transfer hook still applies. Nothing onchain stops the authority using the delegate directly, so this rests on who holds that key ([#19](https://github.com/tsamara-xyz/tsamara/issues/19)) | Tooling |
 | Changing series rules after issuance | No instruction to update the config; rules are fixed at initialization | Designed |
 | Operator access control | Admin routes require a shared token; keys are files on disk | Tooling |
 

@@ -1,0 +1,128 @@
+---
+import "../styles/cinema.css";
+
+const APP = "https://app.tsamara.xyz";
+const REPO = "https://github.com/tsamara-xyz/tsamara";
+
+const scene = "https://raft-blast-61784561.figma.site/_assets/v11";
+const icons = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P";
+const pins = [
+  `${icons}/hf_20260730_230438_d526b8b6-8a2e-4e3b-9993-3908acae03a7.png`,
+  `${icons}/hf_20260730_230442_140bc25b-b165-4249-904a-f708bff6970e.png`,
+  `${icons}/hf_20260730_230448_825949c9-ccdb-4857-b4a6-e349eccc9010.png`,
+];
+
+interface Card {
+  kicker: string;
+  title: string;
+  body: string;
+}
+
+const cards: Card[] = [
+  { kicker: "Terms", title: "Public by default", body: "Akad, maturity, profit rate and restrictions live in the token's own metadata." },
+  { kicker: "KYC gate", title: "Frozen until approved", body: "Only the compliance authority can open an investor's account." },
+  { kicker: "Settlement", title: "Delivery versus payment", body: "Units and dollars move in one transaction, or not at all." },
+  { kicker: "Distributions", title: "Pro rata, onchain", body: "Periodic profit is paid in stablecoins from the issuer treasury." },
+  { kicker: "Status", title: "Devnet prototype", body: "A mock series. Not an offer of securities and not certified." },
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tsamara: sovereign sukuk for everyone</title>
+    <meta name="description" content="Tokenized sovereign sukuk on Solana. Buy from $10 in USDC, trade any time, receive distributions onchain. Devnet prototype." />
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <main class="site-shell">
+      <section class="cinema-scroll" id="cinema" aria-label="Tsamara scroll story">
+        <div class="stage">
+          <div class="world">
+            <img class="scene-img sky-img" src={`${scene}/16b5007d9c93971e26ffe4e0e3e37946f6bd538c.png`} alt="" />
+
+            <header class="site-header" aria-label="Primary navigation">
+              <a class="site-logo" href="#cinema">Tsamara</a>
+              <nav class="site-nav" aria-label="Main menu">
+                <a href="#cinema">Intro</a>
+                <a href={REPO}>GitHub</a>
+                <a href={`${REPO}#how-it-works`}>How it works</a>
+              </nav>
+              <a class="header-cta" href={APP}>
+                <span>Launch app</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            </header>
+
+            <div class="back-stack">
+              <img class="scene-img back-img back-four" src={`${scene}/8a7f8af50e0ce92ec2e228e7b0b4112178c51cf1.png`} alt="" />
+              <section class="sights-slider" aria-label="How Tsamara works">
+                <div class="sights-track">
+                  {cards.map((card, i) => (
+                    <article class="sight-card" tabindex="0" role="button" aria-label={`Open ${card.title} card`}>
+                      <span class="sight-kicker">{card.kicker}</span>
+                      <img class="sight-pin" src={pins[i % pins.length]} alt="" />
+                      <h3>{card.title}</h3>
+                      <p>{card.body}</p>
+                    </article>
+                  ))}
+                </div>
+              </section>
+              <img class="scene-img back-img back-bazaar" src={`${scene}/864afe00e41e2fa20a5aa546e15cb807e0f81384.png`} alt="" />
+            </div>
+
+            <div class="sights-controls" aria-label="Slider controls">
+              <button class="sight-nav sight-prev" aria-label="Previous card">←</button>
+              <button class="sight-nav sight-next" aria-label="Next card">→</button>
+            </div>
+
+            <h1 class="hero-title">TSAMARA</h1>
+
+            <img class="scene-img splitframe-img splitframe-left" src={`${scene}/7536d7b60a1fce482cf6edf3f0bffd3bad5d0f8a.png`} alt="" />
+            <img class="scene-img splitframe-img splitframe-right" src={`${scene}/392db6a6a6b98e868bd7f8d3f55bb719d51e5028.png`} alt="" />
+            <img class="scene-img bridge-img" src={`${scene}/c6a6d8ef49bca43f708aa852692942c45ec950d4.png`} alt="" />
+            <img class="scene-img frame-two-img" src={`${scene}/ba75252bab2b1c510987b74837770f7bc8a6b2d4.png`} alt="" />
+            <div class="shade"></div>
+          </div>
+
+          <section class="intro-copy" aria-label="Tsamara overview">
+            <p>Sovereign sukuk for everyone. Buy from $10 in USDC, trade any time, and receive distributions onchain.</p>
+            <div class="hero-tags" aria-label="Tsamara highlights">
+              <span>From $10</span>
+              <span>Settled in USDC</span>
+              <span>Devnet prototype</span>
+            </div>
+          </section>
+
+          <section class="story-panel story-panel-bridge" aria-label="The problem">
+            <h2>A bridge into sovereign sukuk.</h2>
+            <p>Dollar sukuk are sold to institutions in large minimums and trade over the counter. Tsamara splits a series into small units any approved investor can hold.</p>
+            <dl class="facts">
+              <div>
+                <dt>$10</dt>
+                <dd>Unit size of the demo series</dd>
+              </div>
+              <div>
+                <dt>1 tx</dt>
+                <dd>Payment and delivery settle together</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="story-panel story-panel-bazaar" aria-label="How rules are enforced">
+            <h2>Rules the chain enforces.</h2>
+            <p>Holder accounts start frozen, issuer and compliance keys are separate, and every trade settles atomically. No custom program to trust.</p>
+            <a class="note-button" href={REPO}>
+              <span aria-hidden="true">↗</span>
+              <span>Read the code</span>
+            </a>
+          </section>
+        </div>
+      </section>
+    </main>
+    <script>
+      import "../scripts/cinema.ts";
+    </script>
+  </body>
+</html>

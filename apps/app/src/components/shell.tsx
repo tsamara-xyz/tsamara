@@ -66,7 +66,9 @@ function Footer() {
       <p>
         Tsamara is a prototype running on Solana devnet with a mock sukuk series and test dollars that have no value.
         Nothing on this site is an offer or solicitation to buy or sell securities, and no investment can be made here.
-        Tsamara holds no licence, has no regulatory approval and no sharia certification.
+        Tsamara holds no licence, has no regulatory approval and no sharia certification, and is not affiliated with any
+        sovereign issuer. A real offering would be limited to eligible investors in jurisdictions where it is
+        authorised.
       </p>
       <p>
         Identity verification runs in Sumsub's sandbox. The compliance program is unaudited. Series marked Preview are

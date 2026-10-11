@@ -94,7 +94,7 @@ export function ExplorePage() {
 
       <section className="hero">
         <div>
-          <h1>Sovereign Sukuk, Open Access</h1>
+          <h1>Sovereign Sukuk in $10 Units</h1>
           <p>Dollar sukuk in $10 units, with every transfer rule enforced onchain.</p>
           {live && (
             <Link className="btn light" href={`/assets/${live.symbol.toLowerCase()}`}>
@@ -107,7 +107,7 @@ export function ExplorePage() {
           <li>Ijarah</li>
           <li>Sovereign</li>
           <li>• Sukuk</li>
-          <li>Halal yield</li>
+          <li>Asset-based</li>
           <li>Onchain</li>
         </ul>
       </section>
@@ -201,7 +201,7 @@ export function AssetPage() {
   const decimals = series.paymentDecimals;
   const outstanding = outstandingUnits(holders);
   const stats: [string, string][] = [
-    ["Profit rate", `${rate(asset.profitRateBps)} p.a.`],
+    ["Expected profit rate", `${rate(asset.profitRateBps)} p.a.`],
     ["Distributions", frequency(asset.paymentsPerYear)],
     ["Maturity", asset.maturity],
     ["Structure", asset.akad],
@@ -264,7 +264,7 @@ export function AssetPage() {
           <h3>About</h3>
           <p>
             A mock dollar-denominated sovereign sukuk series used to demonstrate Tsamara. Each unit represents{" "}
-            {usd(asset.unitValue, decimals)} of face value and pays a fixed periodic distribution to registered
+            {usd(asset.unitValue, decimals)} of face value and pays an expected periodic distribution to registered
             investors.
           </p>
           <p className="muted small">This is not a real issuance and not an offer of securities.</p>
@@ -345,7 +345,7 @@ export function PortfolioPage() {
               <th className="num">Units</th>
               <th className="num">Price</th>
               <th className="num">Value</th>
-              <th className="num">Profit rate</th>
+              <th className="num">Expected profit rate</th>
               <th />
             </tr>
           </thead>

@@ -46,6 +46,18 @@ test("program errors are explained in plain language", () => {
   expect(explain(new Error("something else"))).toBe("something else");
 });
 
+// Regression: these reached the notice bar as an empty red box.
+test("errors without a message still say something", () => {
+  const missing = Object.assign(new Error(""), { name: "TokenAccountNotFoundError" });
+  expect(explain(missing)).toMatch(/no sukuk account/);
+  const hookData = Object.assign(new Error(""), { name: "TokenTransferHookAccountDataNotFound" });
+  expect(explain(hookData)).toMatch(/no sukuk account/);
+  const offCurve = Object.assign(new Error(""), { name: "TokenOwnerOffCurveError" });
+  expect(explain(offCurve)).toMatch(/belongs to a program/);
+  expect(explain(new Error(""))).toMatch(/without an error message/);
+  expect(explain(new Error("Non-base58 character"))).toMatch(/not a valid wallet address/);
+});
+
 test("formatting helpers", () => {
   expect(usd("15600000")).toBe("$15.60");
   expect(usd(1_250_000_000n)).toBe("$1,250.00");

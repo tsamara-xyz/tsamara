@@ -96,6 +96,11 @@ export function AssetPage() {
             {usd(asset.unitValue, decimals)} of face value and pays an expected periodic distribution to registered
             investors.
           </p>
+          <p className="muted small">
+            The compliance authority can freeze an account, and can move units without the holder's signature to recover
+            lost keys, for inheritance, or on an order from a court or regulator. Each such transfer is recorded onchain
+            with its reason.
+          </p>
           <p className="muted small">This is not a real issuance and not an offer of securities.</p>
         </section>
 

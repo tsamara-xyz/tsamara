@@ -94,6 +94,44 @@ export function OperatorPage() {
         </section>
       </div>
 
+      <section className="card">
+        <h3>Forced transfer</h3>
+        <p className="muted small">
+          Moves units without the holder's signature, for lost keys, inheritance, or an order from a court or regulator.
+          The reason and the ordering authority are written onchain with the transfer, and the recipient must still be a
+          registered investor within the holding cap.
+        </p>
+        <form
+          className="row"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const form = e.currentTarget;
+            const order = {
+              from: field(form, "from"),
+              to: field(form, "to"),
+              units: Number(field(form, "units")),
+              reason: field(form, "reason"),
+              orderedBy: field(form, "orderedBy"),
+            };
+            run("Forced transfer recorded", async () => (await api.forcedTransfer(token, order)).signature);
+          }}
+        >
+          <input name="from" placeholder="From address" required aria-label="From address" />
+          <input name="to" placeholder="To address" required aria-label="To address" />
+          <input name="units" type="number" min={1} defaultValue={1} required aria-label="Units" className="narrow" />
+          <select name="reason" required aria-label="Reason" defaultValue="lost-key">
+            <option value="lost-key">Lost key</option>
+            <option value="inheritance">Inheritance</option>
+            <option value="court-order">Court order</option>
+            <option value="regulator-order">Regulator order</option>
+          </select>
+          <input name="orderedBy" placeholder="Ordered by (authority and reference)" required aria-label="Ordered by" />
+          <button type="submit" className="btn" disabled={busy}>
+            Transfer
+          </button>
+        </form>
+      </section>
+
       <section className="card list">
         <h3 className="pad">Holders</h3>
         <table className="table">

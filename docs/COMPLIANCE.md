@@ -54,7 +54,7 @@ This is an engineering document, not legal advice. The legal and sharia position
 | Requirement | Control | Status |
 |---|---|---|
 | The underlying sukuk is sharia-compliant | Inherited from the real instrument; the demo series is a mock | External |
-| The series may trade at a negotiated price | Only defensible while the underlying is majority tangible assets. The tangibility ratio is not stored or enforced yet | Designed |
+| The series may trade at a negotiated price | Only defensible while the underlying is majority tangible assets. The ratio and its as-of date are published in the series terms; nothing updates or enforces it yet | Designed |
 | The tokenized structure preserves the holder's rights in the underlying asset | Depends on the legal wrapper between the token and the sukuk, which does not exist yet | External |
 | Sharia board review of the structure and of secondary trading | None | External |
 | Returns are profit distributions, not interest | The series models an expected periodic distribution set by the akad; we deliberately do not use Token-2022's interest-bearing extension | Onchain |

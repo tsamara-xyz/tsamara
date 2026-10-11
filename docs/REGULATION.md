@@ -65,7 +65,7 @@ Indonesia's 2021 Ijtima Ulama ruled crypto impermissible as currency, and valid 
 
 ## What this changes in the design
 
-Tracked as issues; none of it is built.
+Tracked as issues. Built so far: the tangibility ratio and its as-of date are published in the series terms, and the demo dollar series excludes Indonesian residents because it settles in a stablecoin. The rest is not built.
 
 1. Model a series on ijarah, or on wakalah with at least 51% tangible assets. Never murabaha.
 2. Publish onchain: the structure, the tangibility ratio with its as-of date, the purchase-undertaking terms, the record date, the fee schedule, the trustee, and the hash of the sharia pronouncement.

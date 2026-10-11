@@ -2,9 +2,9 @@
 import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { ata, type PaymentToken, transferIx } from "@tsamara/sukuk";
 
-const API = import.meta.env.VITE_API ?? "http://localhost:8788";
-const INDEXER = import.meta.env.VITE_INDEXER ?? "http://localhost:8787";
-export const conn = new Connection(import.meta.env.VITE_RPC ?? "https://api.devnet.solana.com", "confirmed");
+const API = process.env.NEXT_PUBLIC_API ?? "http://localhost:8788";
+const INDEXER = process.env.NEXT_PUBLIC_INDEXER ?? "http://localhost:8787";
+export const conn = new Connection(process.env.NEXT_PUBLIC_RPC ?? "https://api.devnet.solana.com", "confirmed");
 
 export interface Series {
   sukukMint: string;

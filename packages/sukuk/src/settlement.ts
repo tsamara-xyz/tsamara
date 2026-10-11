@@ -17,3 +17,15 @@ export function subscribeIxs(p: {
     createMintToInstruction(p.sukukMint, ata(p.sukukMint, p.investor), p.issuer, p.units, [], T22),
   ];
 }
+
+/** Secondary trade between two KYC'd investors. Sign with seller and buyer. */
+export function tradeIxs(p: {
+  sukukMint: PublicKey; idrMint: PublicKey; seller: PublicKey; buyer: PublicKey; units: bigint; priceRupiah: bigint;
+}): TransactionInstruction[] {
+  return [
+    createTransferCheckedInstruction(
+      ata(p.sukukMint, p.seller), p.sukukMint, ata(p.sukukMint, p.buyer), p.seller, p.units, DECIMALS, [], T22,
+    ),
+    pay(p.idrMint, p.buyer, p.seller, p.priceRupiah),
+  ];
+}

@@ -38,6 +38,7 @@ packages/sukuk       Instruction builders: issuance, KYC, settlement, distributi
 apps/devnet-demo     End-to-end lifecycle on devnet, also the integration check
 apps/indexer         Rust indexer on the Carbon framework: holders and events in SQLite, served over HTTP
 apps/api             Operator API (Hono): co-signs subscriptions, approves investors, pays distributions
+apps/app             Web app for app.tsamara.xyz (React + Vite): investor and operator views
 apps/landing         Landing page for tsamara.xyz (Astro)
 ```
 
@@ -74,6 +75,14 @@ ADMIN_TOKEN=change-me bun apps/api/smoke.ts       # faucet -> KYC -> subscribe -
 ```
 
 Routes under `/admin` (KYC approval, distributions) require the `x-admin-token` header.
+
+With both running, start the web app:
+
+```sh
+bun run app        # http://localhost:5173
+```
+
+Use the built-in test wallet, or Phantom switched to devnet. Request test dollars, approve your address from the Operator tab with the admin token, then subscribe and transfer.
 
 ## Status
 

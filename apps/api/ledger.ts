@@ -3,7 +3,7 @@ import { TOKEN_2022_PROGRAM_ID as T22, unpackAccount } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { approveInvestorIxs, ata, type Investor, investorPda, isEligible } from "@tsamara/sukuk";
 import { fail } from "./http";
-import { compliance, conn, issuer, send, sukukMint, terms } from "./series";
+import { compliance, conn, issuer, payment, send, sukukMint, terms } from "./series";
 
 const INDEXER = process.env.INDEXER ?? "http://localhost:8787";
 
@@ -40,4 +40,12 @@ export async function approveOnchain(investor: Investor): Promise<string> {
   });
   // Already registered (for example re-approving after a revocation): only thaw the account.
   return send((await isRegistered(investor.wallet)) ? ixs.slice(1) : ixs, [issuer, compliance]);
+}
+
+/** Memos on the treasury's recent transactions; this is where a paid distribution batch leaves its mark. */
+// ponytail: the last 1000 treasury transactions; page further back once a series has that much history.
+export async function paidMemos(): Promise<string[]> {
+  const treasury = ata(payment.mint, issuer.publicKey, payment.programId);
+  const signatures = await conn.getSignaturesForAddress(treasury, { limit: 1000 });
+  return signatures.filter((s) => !s.err && s.memo).map((s) => s.memo as string);
 }

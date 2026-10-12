@@ -13,7 +13,7 @@ the issuer and compliance keys. Devnet keys only.
 | `GET /series` | | Mint addresses, payment decimals, issuer, program id, the KYC mode and the terms |
 | `GET /holders` | | Holders, from the indexer |
 | `GET /investors/:wallet` | | `registered` and `units` |
-| `POST /faucet` | `wallet` | Opens the wallet's token accounts, sends $1,000 of test dollars and a little devnet SOL |
+| `POST /faucet` | `wallet` | Opens the wallet's token accounts, sends $1,000 of test dollars and a little devnet SOL. Limited per caller, and refused for a wallet that already has test dollars |
 | `POST /subscribe` | `wallet`, `units` | A base64 transaction signed by the issuer, for the investor to sign and send |
 | `POST /kyc/token` | `wallet` | A Sumsub access token for the verification widget |
 | `POST /kyc/complete` | `wallet` | Reads the verdict from Sumsub and, if approved, registers the investor onchain |
@@ -22,7 +22,8 @@ the issuer and compliance keys. Devnet keys only.
 on mint.
 
 `POST /kyc/complete` trusts nothing the browser says. The verdict and the country come from
-Sumsub's record of the applicant.
+Sumsub's record of the applicant. It registers a new investor; it never reopens the account of
+one who is already registered, so it cannot undo a freeze.
 
 ## Admin routes
 
@@ -32,7 +33,7 @@ These require the `x-admin-token` header.
 |---|---|---|
 | `POST /admin/kyc` | `wallet`, `jurisdiction` | Approves an investor by hand, when no KYC provider is configured |
 | `POST /admin/kyc/sandbox-review` | `wallet`, optional `answer` | Stands in for Sumsub's reviewer in the sandbox |
-| `POST /admin/distribute` | `period` | Pays a period in batches and skips batches already paid |
+| `POST /admin/distribute` | `period` | Pays a period in batches, skips batches already paid, and reports a failed batch without stopping the rest. One run at a time |
 | `POST /admin/forced-transfer` | `from`, `to`, `units`, `reason`, `orderedBy` | Moves units with the permanent delegate and records why |
 
 `period` is 1 to 16 letters, digits or dashes, for example `2026-H2`.

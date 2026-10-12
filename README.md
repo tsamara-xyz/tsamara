@@ -43,6 +43,7 @@ apps/api             Operator API (Hono): co-signs subscriptions, approves inves
 apps/app             Web app for app.tsamara.xyz (Next.js + TanStack Query and Table): explore, asset, portfolio, operator
 apps/landing         Landing page for tsamara.xyz (Astro)
 apps/docs            Documentation for docs.tsamara.xyz (Fumadocs on Next.js; a standalone pnpm project)
+apps/video           The pitch and demo videos (Remotion; a standalone pnpm project)
 ```
 
 ## Run it

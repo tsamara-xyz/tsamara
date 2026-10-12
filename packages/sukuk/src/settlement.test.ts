@@ -3,7 +3,7 @@ import { TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Keypair } from "@solana/web3.js";
 import { COMPLIANCE_PROGRAM_ID } from "./compliance";
 import { DEMO_SERIES } from "./demo-series";
-import { distributionIxs } from "./distribution";
+import { distributionBatches, distributionIxs } from "./distribution";
 import { approveInvestorIxs } from "./kyc";
 import { ata, type PaymentToken } from "./mint";
 import { subscribeIxs } from "./settlement";
@@ -51,4 +51,29 @@ test("approval refuses a restricted jurisdiction before building any instruction
   expect(() => approveInvestorIxs({ ...params, investor: { wallet: key(), jurisdiction: "us" } })).toThrow(
     /not offered/,
   );
+});
+
+test("a distribution is split into period-marked batches that do not depend on input order", () => {
+  const issuer = key();
+  const holdings = Array.from({ length: 17 }, () => ({ owner: key(), units: 10n }));
+  const batches = distributionBatches(usdc, issuer, holdings, DEMO_SERIES, "2026-H2");
+  expect(batches.map((b) => b.payouts.length)).toEqual([8, 8, 1]);
+  expect(batches.map((b) => b.memo)).toEqual([
+    "tsamara:distribution:GSD31:2026-H2:0",
+    "tsamara:distribution:GSD31:2026-H2:1",
+    "tsamara:distribution:GSD31:2026-H2:2",
+  ]);
+  // One memo, then one transfer per payout.
+  expect(batches[0]?.ixs.length).toBe(9);
+  expect(batches[0]?.ixs[0]?.data.toString("utf8")).toBe(batches[0]?.memo as string);
+  const reversed = distributionBatches(usdc, issuer, [...holdings].reverse(), DEMO_SERIES, "2026-H2");
+  expect(reversed.map((b) => b.payouts.map((p) => p.owner.toBase58()))).toEqual(
+    batches.map((b) => b.payouts.map((p) => p.owner.toBase58())),
+  );
+});
+
+test("a distribution needs a well-formed period, and pays nobody who is owed nothing", () => {
+  const holdings = [{ owner: key(), units: 0n }];
+  expect(distributionBatches(usdc, key(), holdings, DEMO_SERIES, "2026-H2")).toEqual([]);
+  expect(() => distributionBatches(usdc, key(), holdings, DEMO_SERIES, "second half of 2026")).toThrow(/period/);
 });

@@ -7,7 +7,7 @@ import {
 import { LAMPORTS_PER_SOL, SystemProgram, Transaction } from "@solana/web3.js";
 import { ata, COMPLIANCE_PROGRAM_ID, subscribeIxs } from "@tsamara/sukuk";
 import { Hono } from "hono";
-import { body, callerOf, fail, json, parseUnits, parseWallet, rateLimiter } from "../http";
+import { body, callerOf, fail, json, parseUnits, parseWallet, rateLimiter, reservations } from "../http";
 import { accessToken, applicant, verdictOf } from "../kyc";
 import { approveOnchain, holders, isRegistered, sukukBalance } from "../ledger";
 import { conn, issuer, payment, send, sukukMint, terms } from "../series";
@@ -90,6 +90,9 @@ investor.post("/faucet", async (c) => {
   return c.json({ signature, usd: FAUCET_USD.toString() });
 });
 
+// A co-signed subscription stays valid for as long as its blockhash, a little over a minute.
+const cosigned = reservations(120_000);
+
 // Returns a subscription transaction signed by the issuer; the investor signs and sends it.
 investor.post("/subscribe", async (c) => {
   const data = await body(c);
@@ -98,9 +101,17 @@ investor.post("/subscribe", async (c) => {
   // The issuer already signs as issuer; as fee payer too, the transaction would need no one else's signature.
   if (wallet.equals(issuer.publicKey)) fail(400, "The issuer cannot subscribe to its own series");
   // The transfer hook does not run on mint, so the holding cap is checked here before the issuer co-signs.
+  // Units co-signed in the last two minutes count as well: such a transaction can still land, and without
+  // this a wallet could collect several signatures while its balance is low and submit them all.
   const held = await sukukBalance(wallet);
-  if (held + units > terms.maxHolding)
-    fail(422, `Holding cap is ${terms.maxHolding} units; this wallet already holds ${held}`);
+  const promised = cosigned.total(wallet.toBase58());
+  if (held + promised + units > terms.maxHolding)
+    fail(
+      422,
+      `Holding cap is ${terms.maxHolding} units; this wallet holds ${held}` +
+        (promised > 0n ? ` and has ${promised} more in subscriptions signed in the last two minutes` : ""),
+    );
+  cosigned.add(wallet.toBase58(), units);
   const tx = new Transaction().add(
     ...subscribeIxs({ sukukMint, payment, issuer: issuer.publicKey, investor: wallet, units, terms }),
   );

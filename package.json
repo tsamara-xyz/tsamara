@@ -6,6 +6,7 @@
     "packages/*",
     "apps/*",
     "!apps/docs",
+    "!apps/video",
     "contracts"
   ],
   "scripts": {

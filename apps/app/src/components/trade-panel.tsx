@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useCallback, useState } from "react";
 import { api, subscribe, transfer, usd } from "@/lib/chain";
 import { KycDialog } from "./kyc-dialog";
 import { useStore } from "./store";
@@ -10,11 +10,22 @@ import { ConnectButtons } from "./ui";
 export function TradePanel() {
   const { series, wallet, position, busy, run } = useStore();
   const [tab, setTab] = useState<"buy" | "send">("buy");
-  const [units, setUnits] = useState(10);
+  const [amount, setAmount] = useState("10");
   const [verifying, setVerifying] = useState(false);
+  const closeKyc = useCallback(() => setVerifying(false), []);
   if (!series) return null;
   const price = BigInt(series.terms.unitValue);
-  const cost = price * BigInt(Math.max(units, 0));
+  // Whole units only: anything else counts as nothing entered, so it can never reach BigInt.
+  const units = /^[1-9]\d*$/.test(amount.trim()) ? Number(amount) : 0;
+  const cost = price * BigInt(units);
+  const cap = Number(series.terms.maxHolding);
+  const room = cap - Number(position?.units ?? 0n);
+  const problem =
+    units === 0
+      ? "Enter a whole number of units."
+      : units > room
+        ? `The holding cap leaves room for ${room} more units.`
+        : "";
   const address = wallet?.publicKey.toBase58() ?? "";
 
   const onSend = (e: FormEvent<HTMLFormElement>) => {
@@ -27,10 +38,20 @@ export function TradePanel() {
   return (
     <aside className="card trade">
       <div className="segmented">
-        <button type="button" className={tab === "buy" ? "on" : ""} onClick={() => setTab("buy")}>
+        <button
+          type="button"
+          aria-pressed={tab === "buy"}
+          className={tab === "buy" ? "on" : ""}
+          onClick={() => setTab("buy")}
+        >
           Buy
         </button>
-        <button type="button" className={tab === "send" ? "on" : ""} onClick={() => setTab("send")}>
+        <button
+          type="button"
+          aria-pressed={tab === "send"}
+          className={tab === "send" ? "on" : ""}
+          onClick={() => setTab("send")}
+        >
           Send
         </button>
       </div>
@@ -47,11 +68,17 @@ export function TradePanel() {
             <input
               type="number"
               min={1}
-              max={Number(series.terms.maxHolding)}
-              value={units}
-              onChange={(e) => setUnits(Number(e.target.value))}
+              step={1}
+              max={Math.max(room, 1)}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              aria-invalid={Boolean(problem)}
+              aria-describedby="units-hint"
             />
           </label>
+          <p id="units-hint" className={`small ${problem ? "warn" : "muted"}`}>
+            {problem || `Holding cap: ${cap} units per investor.`}
+          </p>
           <dl className="quote">
             <div>
               <dt>Price per unit</dt>
@@ -91,7 +118,7 @@ export function TradePanel() {
             <button
               type="button"
               className="btn primary wide"
-              disabled={busy || units < 1}
+              disabled={busy || Boolean(problem)}
               onClick={() => wallet && run("Subscription settled", () => subscribe(wallet, units))}
             >
               Subscribe
@@ -107,7 +134,15 @@ export function TradePanel() {
           </label>
           <label className="field">
             <span>Units (you hold {position ? String(position.units) : "…"})</span>
-            <input name="units" type="number" min={1} defaultValue={1} required />
+            <input
+              name="units"
+              type="number"
+              min={1}
+              step={1}
+              max={Number(position?.units ?? 1n) || 1}
+              defaultValue={1}
+              required
+            />
           </label>
           <button type="submit" className="btn primary wide" disabled={busy}>
             Send
@@ -117,7 +152,7 @@ export function TradePanel() {
           </p>
         </form>
       )}
-      {verifying && <KycDialog onClose={() => setVerifying(false)} />}
+      {verifying && <KycDialog onClose={closeKyc} />}
     </aside>
   );
 }

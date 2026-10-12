@@ -44,7 +44,7 @@ export const termsToFields = (t: SeriesTerms): [string, string][] => [
 ];
 
 export const isEligible = (jurisdiction: string, t: SeriesTerms): boolean =>
-  !t.restrictedJurisdictions.includes(jurisdiction.toUpperCase());
+  !t.restrictedJurisdictions.some((r) => r.toUpperCase() === jurisdiction.toUpperCase());
 
 /** Payment-token base units owed for one period on `units` tokens, rounded down. */
 export const periodicDistribution = (units: bigint, t: SeriesTerms): bigint =>

@@ -52,3 +52,10 @@ test("a series trades at an agreed price only while it is majority tangible", ()
   expect(isTradableAtAgreedPrice(terms)).toBe(true);
   expect(isTradableAtAgreedPrice({ ...terms, tangibleAssetsBps: 5_099 })).toBe(false);
 });
+
+test("eligibility ignores the case of both the country and the restricted list", () => {
+  const terms = { restrictedJurisdictions: ["kp"] } as SeriesTerms;
+  expect(isEligible("KP", terms)).toBe(false);
+  expect(isEligible("kp", terms)).toBe(false);
+  expect(isEligible("AE", terms)).toBe(true);
+});

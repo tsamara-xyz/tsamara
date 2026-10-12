@@ -42,11 +42,6 @@ export const getSoftwareApplicationJsonLd = (): JsonLd => {
     operatingSystem: 'Any',
     url: LANDING_URL,
     description: SHORT_DESCRIPTION,
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD'
-    },
     author: publisher
   };
 };

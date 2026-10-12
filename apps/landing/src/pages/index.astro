@@ -23,7 +23,7 @@ const cards: Card[] = [
   {
     kicker: "Terms",
     title: "Public by default",
-    body: "Akad, maturity, profit rate and restrictions live in the token's own metadata.",
+    body: "Akad, maturity, expected profit rate and restrictions live in the token's own metadata.",
   },
   {
     kicker: "KYC gate",
@@ -38,7 +38,7 @@ const cards: Card[] = [
   {
     kicker: "Distributions",
     title: "Pro rata, onchain",
-    body: "Periodic profit is paid in stablecoins from the issuer treasury.",
+    body: "Expected distributions are paid in stablecoins from the issuer treasury.",
   },
   {
     kicker: "Status",
@@ -53,7 +53,7 @@ const cards: Card[] = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tsamara: sovereign sukuk in $10 units</title>
-    <meta name="description" content="Tokenized sovereign sukuk on Solana. Buy from $10 in USDC, trade any time, receive distributions onchain. Preview release." />
+    <meta name="description" content="Sukuk in $10 units on Solana: subscribe in stablecoins, transfer between approved investors, receive expected distributions onchain. A preview with a demonstration series; not an offer of securities." />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -126,10 +126,10 @@ const cards: Card[] = [
           </div>
 
           <section class="intro-copy" aria-label="Tsamara overview">
-            <p>Sovereign sukuk in $10 units. Subscribe in USDC, transfer between approved investors, and receive distributions onchain.</p>
+            <p>Sovereign sukuk in $10 units. Subscribe in stablecoins, transfer between approved investors, and receive distributions onchain.</p>
             <div class="hero-tags" aria-label="Tsamara highlights">
               <span>From $10</span>
-              <span>Settled in USDC</span>
+              <span>Settled in stablecoins</span>
               <span>Preview</span>
             </div>
           </section>
@@ -151,7 +151,7 @@ const cards: Card[] = [
 
           <section class="story-panel story-panel-bazaar" aria-label="How rules are enforced">
             <h2>Rules the chain enforces.</h2>
-            <p>Holder accounts start frozen, a transfer hook checks every recipient and their holding cap, and every trade settles atomically.</p>
+            <p>Holder accounts start frozen, a transfer hook checks every recipient and their holding cap, and every subscription settles atomically.</p>
             <a class="note-button" href={REPO}>
               <span aria-hidden="true">↗</span>
               <span>Read the code</span>

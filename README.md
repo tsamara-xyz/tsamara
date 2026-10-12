@@ -42,6 +42,7 @@ apps/indexer         Rust indexer on the Carbon framework: holders and events in
 apps/api             Operator API (Hono): co-signs subscriptions, approves investors, pays distributions
 apps/app             Web app for app.tsamara.xyz (Next.js + TanStack Query and Table): explore, asset, portfolio, operator
 apps/landing         Landing page for tsamara.xyz (Astro)
+apps/docs            Documentation for docs.tsamara.xyz (Fumadocs on Next.js; a standalone pnpm project)
 ```
 
 ## Run it

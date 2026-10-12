@@ -67,7 +67,7 @@ export function ExplorePage() {
           <p>Dollar sukuk in $10 units, with every transfer rule enforced onchain.</p>
           {live && (
             <Link className="btn light" href={`/assets/${live.symbol.toLowerCase()}`}>
-              Invest now
+              View the series
             </Link>
           )}
         </div>
@@ -97,7 +97,7 @@ export function ExplorePage() {
                 </span>
                 <span className="num">
                   <strong>{usd(a.unitValue, decimals)}</strong>
-                  <small className="up">{rate(a.profitRateBps)} p.a.</small>
+                  <small className="up">{rate(a.profitRateBps)} expected p.a.</small>
                 </span>
               </Link>
             ))}

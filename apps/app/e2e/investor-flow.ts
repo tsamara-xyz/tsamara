@@ -49,7 +49,7 @@ try {
   assert.ok(address, "the connected wallet's address is shown");
   step(`test wallet connected: ${address}`);
 
-  await page.getByRole("link", { name: "Invest now" }).click();
+  await page.getByRole("link", { name: "View the series" }).click();
   await page.getByRole("heading", { name: "Global Sukuk Demo 2031" }).waitFor();
   await page.getByRole("button", { name: "Get $1,000 test dollars" }).click();
   await notice(page, "Test dollars received");
@@ -65,7 +65,7 @@ try {
   step("operator approved the investor onchain");
 
   await page.getByRole("link", { name: "Explore" }).click();
-  await page.getByRole("link", { name: "Invest now" }).click();
+  await page.getByRole("link", { name: "View the series" }).click();
   await page.getByRole("spinbutton").fill("10");
   await page.getByRole("button", { name: "Subscribe" }).click();
   await notice(page, "Subscription settled");

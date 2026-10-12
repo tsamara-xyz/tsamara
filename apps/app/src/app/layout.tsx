@@ -7,7 +7,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "Tsamara app", template: "%s · Tsamara" },
-  description: "Subscribe to, hold and transfer tokenized sovereign sukuk. Devnet prototype.",
+  description:
+    "A devnet prototype: subscribe to, hold and transfer units of a mock sukuk series. Not an offer of securities.",
   icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" },
   openGraph: { siteName: "Tsamara", images: ["https://tsamara.xyz/og.png"] },
   twitter: { card: "summary_large_image" },

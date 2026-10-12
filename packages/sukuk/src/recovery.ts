@@ -1,8 +1,7 @@
 import { createTransferCheckedWithTransferHookInstruction, TOKEN_2022_PROGRAM_ID as T22 } from "@solana/spl-token";
-import { type Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
+import type { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
+import { memoIx } from "./memo";
 import { ata, SUKUK_DECIMALS } from "./mint";
-
-export const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
 
 /** Why units are being moved without their holder's signature. */
 export interface ForcedTransferOrder {
@@ -36,11 +35,7 @@ export async function forcedTransferIxs(
   if (!reason || !orderedBy) throw new Error("A forced transfer needs a reason and the authority that ordered it");
   const memo = JSON.stringify({ action: "forced-transfer", reason, orderedBy });
   return [
-    new TransactionInstruction({
-      programId: MEMO_PROGRAM_ID,
-      keys: [{ pubkey: p.compliance, isSigner: true, isWritable: false }],
-      data: Buffer.from(memo, "utf8"),
-    }),
+    memoIx(p.compliance, memo),
     await createTransferCheckedWithTransferHookInstruction(
       conn,
       ata(p.sukukMint, p.from),

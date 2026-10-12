@@ -56,7 +56,15 @@ for (let i = 0; ; i++) {
   await Bun.sleep(2000);
 }
 
-const paid = (await call("/admin/distribute", {}, admin)).data;
+// A period is paid once: repeating it skips every batch.
+const period = `T${Date.now() % 100_000_000}`;
+assert.equal((await call("/admin/distribute", {}, admin)).status, 400, "a distribution needs a period");
+const paid = (await call("/admin/distribute", { period }, admin)).data;
+const repeated = (await call("/admin/distribute", { period }, admin)).data;
+assert.ok(paid.batches.every((b: { skipped: boolean }) => !b.skipped));
+assert.ok(
+  repeated.batches.every((b: { skipped: boolean; signature: string | null }) => b.skipped && b.signature === null),
+);
 const mine = paid.payouts.find((p: { owner: string }) => p.owner === wallet);
 assert.equal(mine.amount, "6500000"); // 25 units x $10 x 5.20% / 2 = $6.50
 // With Sumsub configured: approval comes from the provider's verdict and country, read server-side.

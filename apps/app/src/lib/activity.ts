@@ -33,6 +33,18 @@ export function holdingHistory(events: ChainEvent[], wallet: string): HoldingPoi
     });
 }
 
+/** Units outstanding after each subscription, oldest first. */
+export function outstandingHistory(events: ChainEvent[]): HoldingPoint[] {
+  let units = 0;
+  return events
+    .filter((e) => e.time !== null && e.kind === "subscription")
+    .sort((a, b) => (a.time ?? 0) - (b.time ?? 0))
+    .map((e) => {
+      units += Number(e.units);
+      return { time: e.time ?? 0, units };
+    });
+}
+
 export const RANGES = {
   "1D": 86_400,
   "1W": 604_800,

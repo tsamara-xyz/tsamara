@@ -1,5 +1,12 @@
 import { expect, test } from "bun:test";
-import { holdingHistory, inRange, investorCount, outstandingSeries, outstandingUnits } from "./activity";
+import {
+  holdingHistory,
+  inRange,
+  investorCount,
+  outstandingHistory,
+  outstandingSeries,
+  outstandingUnits,
+} from "./activity";
 import type { ChainEvent, Holder } from "./chain";
 
 const event = (kind: ChainEvent["kind"], units: string, time: number): ChainEvent => ({
@@ -64,4 +71,12 @@ test("a range carries the opening balance in and the closing balance out", () =>
   ]);
   expect(inRange(history, "ALL", now)[0]).toEqual({ time: 100, units: 0 });
   expect(inRange([], "1W", now).map((p) => p.units)).toEqual([0, 0]);
+});
+
+test("outstanding history is cumulative, in time order, and counts subscriptions only", () => {
+  const events = [event("subscription", "40", 30), event("trade", "5", 20), event("subscription", "60", 10)];
+  expect(outstandingHistory(events)).toEqual([
+    { time: 10, units: 60 },
+    { time: 30, units: 100 },
+  ]);
 });

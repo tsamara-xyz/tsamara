@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Figtree } from "next/font/google";
 import type { ReactNode } from "react";
 import { Shell } from "@/components/shell";
 import { Providers } from "@/components/store";
@@ -12,11 +13,14 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
+// The reference uses Gellix, a commercial typeface; Figtree is the closest open one.
+const font = Figtree({ subsets: ["latin"], variable: "--font" });
+
 export const viewport: Viewport = { themeColor: "#ffffff" };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={font.variable}>
       <body>
         <Providers>
           <Shell>{children}</Shell>

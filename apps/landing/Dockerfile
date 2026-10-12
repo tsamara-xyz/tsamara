@@ -6,5 +6,6 @@ COPY . .
 RUN bun install --frozen-lockfile --filter '@tsamara/landing' && bun run --cwd apps/landing build
 
 FROM nginx:1.29-alpine
+COPY apps/landing/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /repo/apps/landing/dist /usr/share/nginx/html
 EXPOSE 80

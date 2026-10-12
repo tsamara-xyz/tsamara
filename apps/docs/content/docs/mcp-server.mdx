@@ -1,0 +1,22 @@
+---
+title: MCP server
+description: Live access to these docs for an AI agent.
+---
+
+A Streamable HTTP MCP server at `https://docs.tsamara.xyz/api/mcp` with three tools:
+`list_pages`, `search_docs`, and `get_page`.
+
+**Cursor**, in `.cursor/mcp.json` under `mcpServers`:
+
+```json
+"tsamara": { "url": "https://docs.tsamara.xyz/api/mcp" }
+```
+
+**VS Code**, in `.vscode/mcp.json` under `servers`:
+
+```json
+"tsamara": { "type": "http", "url": "https://docs.tsamara.xyz/api/mcp" }
+```
+
+**Claude and other HTTP MCP clients**: point them at the URL above. The **Copy** menu on any
+page carries a ready-made prompt with these steps.

@@ -121,7 +121,7 @@ export const DocsOgImage = ({ title, description }: DocsOgImageProps) => {
 
 export const SiteOgImage = ({
   title = 'Tsamara',
-  description = 'Sovereign sukuk in $10 units, with every transfer rule enforced onchain.'
+  description = 'Sukuk in $10 units, with every transfer rule enforced onchain. A devnet prototype with a mock series.'
 }: SiteOgImageProps) => {
   return (
     <div

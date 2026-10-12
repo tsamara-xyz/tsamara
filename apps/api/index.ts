@@ -3,16 +3,20 @@
 // Run from the repo root: bun run api
 import { randomBytes } from "node:crypto";
 import { Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { adminRoutes } from "./routes/admin";
 import { investor } from "./routes/investor";
 import { sukukMint } from "./series";
 
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? randomBytes(12).toString("hex");
+// `||`, not `??`: an empty ADMIN_TOKEN must not become an empty password that an empty header matches.
+const generated = !process.env.ADMIN_TOKEN;
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || randomBytes(12).toString("hex");
 
 const app = new Hono();
 app.use("*", cors());
+app.use("*", bodyLimit({ maxSize: 16 * 1024 }));
 app.onError((err, c) => {
   if (err instanceof HTTPException) return c.json({ error: err.message }, err.status);
   console.error(err);
@@ -27,4 +31,5 @@ process.on("unhandledRejection", (reason) => console.error("unhandled rejection:
 
 const server = Bun.serve({ port: Number(process.env.API_PORT ?? 8788), fetch: app.fetch });
 console.log(`Operator API on http://localhost:${server.port} for series ${sukukMint.toBase58()}`);
-console.log(`Admin token: ${ADMIN_TOKEN}`);
+// Only a token generated for this run is printed; one supplied by the operator stays out of the logs.
+if (generated) console.log(`Admin token for this run: ${ADMIN_TOKEN}`);

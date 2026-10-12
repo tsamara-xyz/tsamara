@@ -669,9 +669,11 @@ button {
   .sights-slider {
     padding: 0;
   }
+  /* Centre the active card on a phone. The zoomed scene already pulls the track about 18vw to the left,
+     so the desktop offset would leave the active card mostly off-screen. */
   .sights-track {
     gap: 12px;
-    transform: translate3d(calc(var(--sights-shift) - 18vw), 0, 0);
+    transform: translate3d(calc(var(--sights-shift) + 27vw), 0, 0);
   }
   .sight-card {
     flex-basis: min(82vw, 330px);

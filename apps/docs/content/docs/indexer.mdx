@@ -1,0 +1,47 @@
+---
+title: Indexer
+description: A Rust service that turns the series' transactions into holders and events.
+---
+
+`apps/indexer` is built on the [Carbon](https://github.com/sevenlabs-hq/carbon) framework. It
+crawls the transactions of one series over RPC, classifies each one, stores the result in
+SQLite, and serves it over HTTP. It only reads the chain.
+
+## Endpoints
+
+| Route | Returns |
+|---|---|
+| `GET /series` | The mints and issuer being indexed |
+| `GET /holders` | Each wallet, its units, and whether it is approved |
+| `GET /events` | The latest 200 events, newest first |
+| `GET /events?wallet=<address>` | One wallet's history |
+
+## Events
+
+| Kind | Meaning |
+|---|---|
+| `approved` | An investor's account was opened |
+| `revoked` | An investor's account was frozen |
+| `subscription` | Units minted against a payment |
+| `trade` | Units moved between investors |
+| `distribution` | A payment from the treasury to a holder |
+
+Each event carries the transaction signature, its time, the wallet, a counterparty where there
+is one, the units and the amount paid. An event is stored once, however often its transaction
+is seen.
+
+## Run
+
+```sh
+bun run indexer --once   # index what exists, print holders and the event count, exit
+bun run indexer          # keep indexing and serve on PORT, default 8787
+```
+
+It follows the series from the last `bun run demo`, or the one named by `SUKUK_MINT`,
+`PAYMENT_MINT` and `ISSUER`. It reads from `RPC`, by default public devnet, and stores to
+`.data/indexer-<SUKUK_MINT>.db`. Without a persistent disk it rebuilds from the chain on start.
+
+## Why the API needs it
+
+Public RPC endpoints refuse the queries that would list a Token-2022 mint's holders, so the API
+reads the holder list from the indexer when it pays a distribution.

@@ -1,0 +1,56 @@
+---
+title: For builders
+description: The parts of Tsamara, what each one is responsible for, and how to run them.
+---
+
+Everything is in one repository, [tsamara-xyz/tsamara](https://github.com/tsamara-xyz/tsamara).
+
+## The parts
+
+| Path | What it is |
+|---|---|
+| `contracts` | Anchor program: the transfer hook, the series rules, the investor registry |
+| `packages/sukuk` | TypeScript instruction builders: issuance, approval, settlement, distribution, recovery |
+| `apps/indexer` | Rust indexer on the Carbon framework: holders and events in SQLite, served over HTTP |
+| `apps/api` | Operator API on Hono: co-signs subscriptions, approves investors, pays distributions |
+| `apps/app` | The web app, Next.js with TanStack Query and Table |
+| `apps/landing` | The landing page, Astro |
+| `apps/docs` | These docs, Fumadocs on Next.js |
+| `apps/devnet-demo` | The whole lifecycle on devnet as one script, also the integration check |
+
+## Who enforces what
+
+The token is a Token-2022 mint with four extensions: metadata on the mint, accounts frozen by
+default, a transfer hook, and a permanent delegate. The
+[compliance program](/docs/compliance-program) is the transfer hook. The
+[library](/docs/sukuk-library) builds every instruction, and the [API](/docs/api) holds the
+operator's keys and uses the library. The [indexer](/docs/indexer) reads the chain and never
+writes to it. The app talks to the API, the indexer and the chain.
+
+A rule enforced by a program holds even if the API misbehaves. A rule enforced only by the API
+does not. [Compliance mapping](/docs/compliance-mapping) says which is which.
+
+## Run it
+
+Requires [Bun](https://bun.sh). The indexer requires [Rust](https://rustup.rs) 1.91 or newer.
+
+```sh
+bun install
+bun test          # every TypeScript suite, no network needed
+bun run demo      # the full lifecycle on devnet, prints explorer links
+```
+
+The first `bun run demo` prints an issuer address. Fund it with devnet SOL from
+[faucet.solana.com](https://faucet.solana.com) and run it again.
+
+To run the stack locally:
+
+```sh
+bun run indexer                       # terminal 1, serves on 8787
+ADMIN_TOKEN=change-me bun run api     # terminal 2, serves on 8788
+bun run app                           # terminal 3, http://localhost:3000
+```
+
+The API creates a live series on first start and writes its addresses to `.keys/series.json`.
+Identity checks go through Sumsub when `SUMSUB_TOKEN` and `SUMSUB_SECRET` are set to sandbox
+credentials. Without them the operator approves investors by hand from the Operator page.

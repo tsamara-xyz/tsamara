@@ -1,0 +1,70 @@
+---
+title: The sukuk library
+description: packages/sukuk builds every instruction Tsamara sends.
+---
+
+`@tsamara/sukuk` is a TypeScript package of pure instruction builders on `@solana/web3.js` and
+`@solana/spl-token`. It signs nothing and sends nothing: the caller decides who signs.
+
+## A series
+
+`SeriesTerms` describes a series: name, symbol, akad, maturity, currency,
+`expectedProfitRateBps`, `paymentsPerYear`, `unitValue`, `restrictedJurisdictions`,
+`maxHolding`, `tangibleAssetsBps` and `tangibilityAsOf`. `DEMO_SERIES` is the one the demo uses.
+
+| Function | Use |
+|---|---|
+| `issueSeriesIxs` | Create the mint with its extensions and publish the terms as metadata |
+| `publishTermsIxs` | Write or update the metadata fields |
+| `initializeComplianceIx` | Create the series config for the transfer hook |
+| `isEligible` | Whether a country may hold the series |
+| `isTradableAtAgreedPrice` | Whether tangible assets are at least 51% |
+
+## Investors
+
+| Function | Use |
+|---|---|
+| `approveInvestorIxs` | Register the investor and thaw their token account; throws early for a restricted country |
+| `registerInvestorIx` | Only the investor record |
+| `revokeInvestorIx` | Freeze the account |
+
+## Settlement
+
+| Function | Use |
+|---|---|
+| `subscribeIxs` | Payment to the issuer and minting to the investor, for one transaction |
+| `transferIx` | A transfer with the hook's extra accounts resolved |
+| `tradeIxs` | Payment one way and units the other, between two investors, for one transaction |
+| `payIx` | A payment-token transfer |
+
+The payment token is a `PaymentToken`: mint, decimals and token program. Any token on either
+token program works.
+
+## Distributions
+
+| Function | Use |
+|---|---|
+| `periodicDistribution` | What a holding earns in one period, rounded down |
+| `distributionBatches` | Payments grouped eight to a transaction, each batch with its memo |
+| `distributionMemo` | `tsamara:distribution:<symbol>:<period>:<batch>` |
+
+## Recovery
+
+`forcedTransferIxs` moves units using the permanent delegate. It refuses to build the transfer
+without a `reason` and an `orderedBy`, and adds a memo carrying both.
+
+## Example
+
+```ts
+import { DEMO_SERIES, subscribeIxs } from '@tsamara/sukuk';
+
+const ixs = subscribeIxs({
+  sukukMint,
+  payment,              // { mint, decimals, programId }
+  issuer: issuer.publicKey,
+  investor: wallet,
+  units: 10n,
+  terms: DEMO_SERIES
+});
+// One transaction, signed by the investor and the issuer.
+```

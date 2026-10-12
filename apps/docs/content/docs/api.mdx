@@ -1,0 +1,48 @@
+---
+title: Operator API
+description: The HTTP service that holds the operator's keys.
+---
+
+`apps/api` is a Hono service on Bun, at `https://api.tsamara.xyz` in the deployment. It holds
+the issuer and compliance keys. Devnet keys only.
+
+## Public routes
+
+| Route | Body | Returns |
+|---|---|---|
+| `GET /series` | | Mint addresses, payment decimals, issuer, program id, the KYC mode and the terms |
+| `GET /holders` | | Holders, from the indexer |
+| `GET /investors/:wallet` | | `registered` and `units` |
+| `POST /faucet` | `wallet` | Opens the wallet's token accounts, sends $1,000 of test dollars and a little devnet SOL |
+| `POST /subscribe` | `wallet`, `units` | A base64 transaction signed by the issuer, for the investor to sign and send |
+| `POST /kyc/token` | `wallet` | A Sumsub access token for the verification widget |
+| `POST /kyc/complete` | `wallet` | Reads the verdict from Sumsub and, if approved, registers the investor onchain |
+
+`POST /subscribe` checks the holding cap before the issuer signs, because the hook does not run
+on mint.
+
+`POST /kyc/complete` trusts nothing the browser says. The verdict and the country come from
+Sumsub's record of the applicant.
+
+## Admin routes
+
+These require the `x-admin-token` header.
+
+| Route | Body | Does |
+|---|---|---|
+| `POST /admin/kyc` | `wallet`, `jurisdiction` | Approves an investor by hand, when no KYC provider is configured |
+| `POST /admin/kyc/sandbox-review` | `wallet`, optional `answer` | Stands in for Sumsub's reviewer in the sandbox |
+| `POST /admin/distribute` | `period` | Pays a period in batches and skips batches already paid |
+| `POST /admin/forced-transfer` | `from`, `to`, `units`, `reason`, `orderedBy` | Moves units with the permanent delegate and records why |
+
+`period` is 1 to 16 letters, digits or dashes, for example `2026-H2`.
+
+## Errors
+
+Failures return a JSON body with an `error` message and a 4xx or 5xx status.
+
+## Limits
+
+The admin token is one shared secret and the keys are files or environment variables. The
+Sumsub client refuses any token that is not a sandbox token. A webhook from Sumsub would replace
+the `kyc/complete` call; it is not built.

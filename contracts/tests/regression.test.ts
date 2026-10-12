@@ -52,7 +52,9 @@ describe("the hook cannot be bypassed", () => {
         k.pubkey.equals(ata(mint, lukas.publicKey)) ? { ...k, pubkey: ata(mint, unregistered.publicKey) } : k,
       ),
     });
-    expect(() => world.send([forged], [amira])).toThrow();
+    // Token-2022 resolves the hook's extra accounts itself and rejects the mismatch (IncorrectAccount) before
+    // the hook runs, so this pins the token program's check; the hook's own seeds constraint is a second line.
+    expect(() => world.send([forged], [amira])).toThrow(/Custom\(2724315840\)/);
     expect(await world.units(unregistered)).toBe(0n);
   });
 });
@@ -96,8 +98,9 @@ describe("forced transfer", () => {
 
   test("no other key can, including the issuer", async () => {
     const { world, amira, lukas } = await seriesWithInvestors(60n);
-    await expect(world.forcedTransfer(amira, lukas, 1n, order, world.issuer)).rejects.toThrow();
-    await expect(world.forcedTransfer(amira, lukas, 1n, order, lukas)).rejects.toThrow();
+    // Token-2022's OwnerMismatch: the signer is neither the owner nor the permanent delegate.
+    await expect(world.forcedTransfer(amira, lukas, 1n, order, world.issuer)).rejects.toThrow(/Custom\(4\)/);
+    await expect(world.forcedTransfer(amira, lukas, 1n, order, lukas)).rejects.toThrow(/Custom\(4\)/);
     expect(await world.units(amira)).toBe(60n);
   });
 

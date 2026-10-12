@@ -5,7 +5,7 @@ import { Providers } from "@/components/store";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tsamara app",
+  title: { default: "Tsamara app", template: "%s · Tsamara" },
   description: "Subscribe to, hold and transfer tokenized sovereign sukuk. Devnet prototype.",
   icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" },
 };

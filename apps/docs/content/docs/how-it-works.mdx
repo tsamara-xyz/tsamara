@@ -1,0 +1,53 @@
+---
+title: How it works
+description: From a published series to a distribution, in five steps.
+---
+
+## 1. A series is published
+
+The issuer creates a token for the series. Its terms are stored on the token itself, where
+anyone can read them: the structure (akad), maturity, currency, expected profit rate, unit size,
+the jurisdictions it is not offered in, the holding cap, and the share of tangible assets with
+its as-of date.
+
+## 2. An investor is approved
+
+Every sukuk account starts frozen. An investor verifies their identity, the operator's API reads
+the result and the document's country, and only then does the compliance authority register the
+investor onchain and open their account. The issuer's key cannot do this: minting and approval
+are separate keys.
+
+## 3. The investor subscribes
+
+Payment and delivery are two instructions in one transaction, signed by the investor and the
+issuer. Either both happen or neither does. A subscription cannot half-settle.
+
+## 4. Units move between approved investors
+
+A holder can send units to another wallet. On every transfer, Token-2022 calls Tsamara's
+compliance program, which refuses the transfer unless the recipient is a registered investor, in
+a jurisdiction the series is offered in, and still within the holding cap afterwards.
+
+## 5. The distribution is paid
+
+The issuer pays the periodic distribution in stablecoins, pro rata to holdings. Each batch of
+payments is marked onchain with the series and the period, so paying the same period again skips
+what is already paid.
+
+## The rule and what enforces it
+
+| Rule | Mechanism |
+|---|---|
+| The terms are public | Token metadata stored on the mint |
+| Only approved investors can hold units | Accounts are frozen by default; the compliance authority opens them |
+| The issuer cannot decide who holds | Mint authority and freeze authority are separate keys |
+| A recipient must be a registered investor in an allowed jurisdiction | The transfer hook checks the recipient's investor record |
+| No investor can receive more than the holding cap | The transfer hook checks the recipient's balance after the transfer |
+| A subscription cannot half-settle | Payment and delivery are in one transaction |
+| Distributions are pro rata and not paid twice | Integer math from indexed holdings; period-marked batches |
+
+<Callout type="info">
+The hook does not run when units are minted, so on a primary subscription the holding cap is
+checked by the operator's API rather than by the program. That gap is tracked as
+[issue 21](https://github.com/tsamara-xyz/tsamara/issues/21).
+</Callout>

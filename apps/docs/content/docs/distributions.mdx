@@ -1,0 +1,36 @@
+---
+title: Distributions
+description: How the periodic distribution is calculated, paid, and kept from being paid twice.
+---
+
+## What a distribution is
+
+A sukuk does not pay interest. The series has an **expected profit rate**, set by its structure,
+and pays an expected periodic distribution out of what the underlying assets earn. It is an
+expectation, not a guarantee.
+
+## The amount
+
+For the demo series: $10 a unit, 5.20% a year, paid twice a year. One unit receives $0.26 per
+period, and 20 units receive $5.20. The math is done in whole base units of the payment token
+and rounded down, so the treasury can never pay more than the total owed.
+
+## How it is paid
+
+The operator names the period, for example `2026-H2`. The API reads the holders from the
+indexer and pays them from the issuer's treasury in batches of eight payments per transaction.
+
+Each batch carries a memo naming the series, the period and the batch number:
+
+```
+tsamara:distribution:GSD31:2026-H2:0
+```
+
+Before sending a batch, the API looks for its memo on the treasury's history and skips the
+batch if it is there. Paying the same period again therefore pays nobody twice, and a run that
+failed halfway can simply be repeated.
+
+<Callout type="info">
+If holdings change between a failed run and its retry, the batch boundaries can move. A series
+larger than one batch still needs a record-date snapshot, which is not built.
+</Callout>

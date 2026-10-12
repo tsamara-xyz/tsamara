@@ -84,8 +84,13 @@ export const api = {
     request<{ reviewAnswer: string }>(API, "/admin/kyc/sandbox-review", { wallet }, token),
   kyc: (token: string, wallet: string, jurisdiction: string) =>
     request<{ signature: string }>(API, "/admin/kyc", { wallet, jurisdiction }, token),
-  distribute: (token: string) =>
-    request<{ signature: string; payouts: { owner: string; amount: string }[] }>(API, "/admin/distribute", {}, token),
+  distribute: (token: string, period: string) =>
+    request<{ batches: { memo: string; skipped: boolean; signature: string | null }[] }>(
+      API,
+      "/admin/distribute",
+      { period },
+      token,
+    ),
   holders: () => request<Holder[]>(INDEXER, "/holders"),
   events: (wallet?: string) => request<ChainEvent[]>(INDEXER, wallet ? `/events?wallet=${wallet}` : "/events"),
 };

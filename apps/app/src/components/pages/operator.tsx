@@ -100,7 +100,7 @@ export function OperatorPage() {
             <input
               name="period"
               placeholder="Period (e.g. 2026-H2)"
-              pattern="[A-Za-z0-9-]{1,16}"
+              pattern="[A-Za-z0-9\-]{1,16}"
               required
               aria-label="Period"
             />

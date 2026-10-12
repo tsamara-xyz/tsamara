@@ -82,15 +82,32 @@ export function OperatorPage() {
 
         <section className="card">
           <h3>Pay the periodic distribution</h3>
-          <p className="muted small">Pays every holder pro rata from the issuer treasury in one transaction.</p>
-          <button
-            type="button"
-            className="btn primary"
-            disabled={busy}
-            onClick={() => run("Distribution paid", async () => (await api.distribute(token)).signature)}
+          <p className="muted small">
+            Pays every holder pro rata from the issuer treasury. Each batch is marked onchain with the period, so paying
+            the same period again skips what is already paid.
+          </p>
+          <form
+            className="row"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const period = field(e.currentTarget, "period");
+              run(`Distribution for ${period} paid; batches already paid were skipped`, async () => {
+                const { batches } = await api.distribute(token, period);
+                return batches.find((b) => b.signature)?.signature ?? undefined;
+              });
+            }}
           >
-            Pay all holders
-          </button>
+            <input
+              name="period"
+              placeholder="Period (e.g. 2026-H2)"
+              pattern="[A-Za-z0-9-]{1,16}"
+              required
+              aria-label="Period"
+            />
+            <button type="submit" className="btn primary" disabled={busy}>
+              Pay all holders
+            </button>
+          </form>
         </section>
       </div>
 

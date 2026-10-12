@@ -8,12 +8,12 @@ import { short, usd } from "@/lib/chain";
 import { Activity } from "../activity-table";
 import { useStore } from "../store";
 import { TradePanel } from "../trade-panel";
-import { AssetIcon, Sparkline, StatusPill } from "../ui";
+import { AssetIcon, SeriesPending, Sparkline, StatusPill } from "../ui";
 
 export function AssetPage() {
   const { symbol } = useParams<{ symbol: string }>();
   const { series, holders, events } = useStore();
-  if (!series) return <p className="muted pad">Loading series…</p>;
+  if (!series) return <SeriesPending />;
   const asset: Asset | undefined = assetsFor(series).find(
     (a) => a.symbol.toLowerCase() === symbol?.toLowerCase() && a.live,
   );

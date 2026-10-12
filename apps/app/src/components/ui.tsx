@@ -49,11 +49,27 @@ export function StatusPill({ live }: { live: boolean }) {
   return <span className={`status ${live ? "open" : ""}`}>{live ? "Open on devnet" : "Preview"}</span>;
 }
 
-export function NoticeBar() {
-  const { notice, dismiss } = useStore();
-  if (!notice) return null;
+/** What a page shows until the series has loaded. */
+export function SeriesPending() {
+  const { offline } = useStore();
   return (
-    <div className={`notice ${notice.tone}`} role="status">
+    <p className="muted pad" role="status">
+      {offline ? "The Tsamara API is not reachable right now. Retrying every few seconds…" : "Loading series…"}
+    </p>
+  );
+}
+
+export function NoticeBar() {
+  const { notice, busy, dismiss } = useStore();
+  if (!notice) {
+    return busy ? (
+      <div className="notice" role="status">
+        Working… waiting for confirmation on devnet. This can take up to a minute.
+      </div>
+    ) : null;
+  }
+  return (
+    <div className={`notice ${notice.tone}`} role={notice.tone === "error" ? "alert" : "status"}>
       <span>
         {notice.text}{" "}
         {notice.signature && (

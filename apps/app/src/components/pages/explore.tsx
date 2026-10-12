@@ -9,14 +9,14 @@ import { describe } from "../activity-table";
 import { AssetCard } from "../asset-card";
 import { SeriesTable } from "../series-table";
 import { useStore } from "../store";
-import { AssetIcon, Sparkline } from "../ui";
+import { AssetIcon, SeriesPending, Sparkline } from "../ui";
 
 export function ExplorePage() {
   const { series, holders, events, wallet, position, search: query } = useStore();
   const [tab, setTab] = useState<"all" | "live" | "preview">("all");
   const [structure, setStructure] = useState("All structures");
   const [view, setView] = useState<"list" | "grid">("list");
-  if (!series) return <p className="muted pad">Loading series…</p>;
+  if (!series) return <SeriesPending />;
 
   const decimals = series.paymentDecimals;
   const chart = outstandingSeries(events);
@@ -50,7 +50,7 @@ export function ExplorePage() {
           </div>
           <div>
             <dt>KYC</dt>
-            <dd>{position?.registered ? "Approved" : "Not approved"}</dd>
+            <dd>{position?.registered ? "Approved" : wallet ? "Not approved" : "—"}</dd>
           </div>
         </dl>
         <Sparkline points={chart} width={220} height={44} />
@@ -135,7 +135,13 @@ export function ExplorePage() {
       <section className="card list">
         <div className="tabs">
           {(["all", "live", "preview"] as const).map((t) => (
-            <button type="button" key={t} className={tab === t ? "on" : ""} onClick={() => setTab(t)}>
+            <button
+              type="button"
+              key={t}
+              aria-pressed={tab === t}
+              className={tab === t ? "on" : ""}
+              onClick={() => setTab(t)}
+            >
               {t === "all" ? "Sukuk series" : t === "live" ? "Open" : "Preview"}{" "}
               <span className="tag">{assets.filter((a) => t === "all" || (t === "live") === a.live).length}</span>
             </button>
@@ -147,6 +153,7 @@ export function ExplorePage() {
             <button
               type="button"
               key={name}
+              aria-pressed={structure === name}
               className={`chip ${structure === name ? "on" : ""}`}
               onClick={() => setStructure(name)}
             >
@@ -157,6 +164,7 @@ export function ExplorePage() {
             <button
               type="button"
               className={view === "list" ? "on" : ""}
+              aria-pressed={view === "list"}
               onClick={() => setView("list")}
               aria-label="List view"
             >
@@ -165,6 +173,7 @@ export function ExplorePage() {
             <button
               type="button"
               className={view === "grid" ? "on" : ""}
+              aria-pressed={view === "grid"}
               onClick={() => setView("grid")}
               aria-label="Grid view"
             >

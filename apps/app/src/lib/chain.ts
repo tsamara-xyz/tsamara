@@ -174,6 +174,8 @@ export function explain(error: unknown): string {
   if (/AccountNotInitialized|0xbc4/.test(text)) return "Rejected onchain: the recipient is not a registered investor.";
   if (/insufficient funds|0x1\b/.test(text)) return "Not enough balance for this transaction.";
   if (/User rejected/i.test(text)) return "You cancelled the request in your wallet.";
+  if (/was not confirmed in/i.test(text))
+    return "The network did not confirm the transaction in time. It may still land: check your balance before trying again.";
   // spl-token throws these with an empty message when the recipient never opened a sukuk account.
   if (error instanceof Error && /Account(Data)?NotFound/.test(error.name))
     return "That wallet has no sukuk account, so it cannot receive units. The recipient must onboard first.";

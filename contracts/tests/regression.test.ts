@@ -81,6 +81,19 @@ describe("forced transfer", () => {
     expect(await world.units(lukas)).toBe(60n);
   });
 
+  test("units leave a revoked investor's frozen account, which is frozen again afterwards", async () => {
+    const { world, amira, lukas } = await seriesWithInvestors(60n);
+    world.send(
+      [revokeInvestorIx(world.mint.publicKey, amira.publicKey, world.compliance.publicKey)],
+      [world.issuer, world.compliance],
+    );
+    await world.forcedTransfer(amira, lukas, 60n, { reason: "court-order", orderedBy: "District court, 12/2026" });
+    expect(await world.units(amira)).toBe(0n);
+    expect(await world.units(lukas)).toBe(60n);
+    world.mintTo(lukas, 1n);
+    await expect(world.transfer(lukas, amira, 1n)).rejects.toThrow(/frozen/i);
+  });
+
   test("no other key can, including the issuer", async () => {
     const { world, amira, lukas } = await seriesWithInvestors(60n);
     await expect(world.forcedTransfer(amira, lukas, 1n, order, world.issuer)).rejects.toThrow();

@@ -60,8 +60,8 @@ function TopNav() {
             {link.label}
           </Link>
         ))}
-        <a href="https://github.com/tsamara-xyz/tsamara" target="_blank" rel="noreferrer">
-          Resources
+        <a href="https://docs.tsamara.xyz" target="_blank" rel="noreferrer">
+          Docs
         </a>
       </nav>
       <input
@@ -93,10 +93,10 @@ function Footer() {
       <div className="footer-bar">
         <strong>Tsamara © 2026</strong>
         <a href="https://tsamara.xyz">tsamara.xyz</a>
-        <a href="https://github.com/tsamara-xyz/tsamara/blob/main/docs/COMPLIANCE.md" target="_blank" rel="noreferrer">
+        <a href="https://docs.tsamara.xyz/docs/compliance-mapping" target="_blank" rel="noreferrer">
           Compliance mapping
         </a>
-        <a href="https://github.com/tsamara-xyz/tsamara/blob/main/docs/REGULATION.md" target="_blank" rel="noreferrer">
+        <a href="https://docs.tsamara.xyz/docs/regulation" target="_blank" rel="noreferrer">
           Regulatory notes
         </a>
         <a className="footer-end" href="https://github.com/tsamara-xyz/tsamara" target="_blank" rel="noreferrer">

@@ -51,7 +51,8 @@ export function distributionBatches(
   const payouts = holdings
     .map((h) => ({ owner: h.owner, amount: periodicDistribution(h.units, terms) }))
     .filter((p) => p.amount > 0n)
-    .sort((a, b) => a.owner.toBase58().localeCompare(b.owner.toBase58()));
+    // Plain code-unit order: localeCompare depends on the host's locale, and a retry must cut the same batches.
+    .sort((a, b) => (a.owner.toBase58() < b.owner.toBase58() ? -1 : 1));
   const batches: DistributionBatch[] = [];
   for (let i = 0; i < payouts.length; i += size) {
     const slice = payouts.slice(i, i + size);

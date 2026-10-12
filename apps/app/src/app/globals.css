@@ -48,6 +48,12 @@ main {
   gap: 20px;
 }
 
+/* Grid children default to their content's minimum width; let them shrink so wide content scrolls inside its card */
+main > *,
+.detail > * {
+  min-width: 0;
+}
+
 /* Top navigation */
 .nav {
   display: flex;
@@ -447,6 +453,10 @@ code {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.name span {
+  white-space: nowrap;
 }
 
 .status {
@@ -1095,6 +1105,35 @@ button.chip.on {
   border-top: 1px solid var(--line);
 }
 
+/* Text inside cards: a heading, a paragraph and a control should not touch each other */
+.card > p + p,
+.card > dl + p,
+.card > form + p,
+.card > button + p {
+  margin-top: 10px;
+}
+
+.card > h2 + p,
+.card > h3 + p {
+  margin-bottom: 14px;
+}
+
+.card > h2 {
+  margin-bottom: 6px;
+}
+
+.card > .field {
+  margin-top: 14px;
+}
+
+.table.compact td:nth-child(n + 2) {
+  white-space: nowrap;
+}
+
+.chart-scroll {
+  overflow-x: auto;
+}
+
 @media (max-width: 980px) {
   .trio,
   .two,
@@ -1107,8 +1146,34 @@ button.chip.on {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .nav nav,
-  .hero ul {
+  /* Navigation wraps: brand and wallet first, then the links, then the search box */
+  .nav {
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    height: auto;
+    padding: 12px 0;
+  }
+
+  .brand {
+    margin-right: auto;
+  }
+
+  .nav nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .search {
+    order: 4;
+    flex-basis: 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .nav .chip:not([title]),
+  .hero ul,
+  .tabs-end {
     display: none;
   }
 
@@ -1116,7 +1181,62 @@ button.chip.on {
     overflow-x: auto;
   }
 
+  /* The series table keeps its columns and scrolls sideways instead of crushing them */
+  .card.list > .table {
+    min-width: 760px;
+  }
+
+  /* The trade panel is the point of the asset page, so it comes first on a narrow screen */
   .trade {
     position: static;
+    order: -1;
+  }
+
+  .area-chart {
+    min-width: 560px;
+  }
+}
+
+@media (max-width: 640px) {
+  .shell {
+    padding: 0 16px 40px;
+  }
+
+  .tiles,
+  .legend {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 28px 24px;
+  }
+
+  .hero h1 {
+    font-size: 26px;
+  }
+
+  .figure {
+    font-size: 36px;
+  }
+
+  .strip {
+    gap: 20px;
+  }
+
+  .strip .spark {
+    display: none;
+  }
+
+  .welcome {
+    flex-wrap: wrap;
+  }
+
+  .welcome time {
+    flex-basis: 100%;
+    margin-left: 48px;
+  }
+
+  .table.compact {
+    font-size: 13px;
   }
 }

@@ -94,7 +94,7 @@ pub fn holders(db: &Connection) -> Result<Vec<Value>> {
 
 pub fn events(db: &Connection, wallet: Option<&str>) -> Result<Vec<Value>> {
     let sql = match wallet {
-        Some(_) => "SELECT * FROM events WHERE wallet = ?1 OR counterparty = ?1 ORDER BY slot DESC",
+        Some(_) => "SELECT * FROM events WHERE wallet = ?1 OR counterparty = ?1 ORDER BY slot DESC LIMIT 500",
         None => "SELECT * FROM events WHERE ?1 IS NULL ORDER BY slot DESC LIMIT 200",
     };
     db.prepare(sql)?

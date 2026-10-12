@@ -1,0 +1,61 @@
+{
+  "name": "@tsamara/docs",
+  "private": true,
+  "license": "MIT",
+  "version": "0.0.1",
+  "description": "Tsamara documentation, docs.tsamara.xyz",
+  "homepage": "https://docs.tsamara.xyz",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsamara-xyz/tsamara.git",
+    "directory": "apps/docs"
+  },
+  "bugs": {
+    "url": "https://github.com/tsamara-xyz/tsamara/issues"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "lint:links": "node ./scripts/lint-links.mts",
+    "postinstall": "node ./node_modules/fumadocs-mdx/bin.js",
+    "clean": "pnpm clean:cache && pnpm i",
+    "clean:cache": "find . \\( -name '.next' -o -name '.source' -o -name 'node_modules' -o -name 'pnpm-lock.yaml' \\) -prune -exec rm -rf '{}' +"
+  },
+  "dependencies": {
+    "@gravity-ui/icons": "2.21.0",
+    "@modelcontextprotocol/server": "2.0.0",
+    "fumadocs-core": "16.14.0",
+    "fumadocs-mdx": "15.2.1",
+    "fumadocs-ui": "16.14.0",
+    "mcp-handler": "2.1.0",
+    "next": "16.2.12",
+    "next-themes": "0.4.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "shiki": "4.4.1",
+    "tailwind-variants": "3.3.1",
+    "takumi-js": "2.5.4",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.6",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/mdx": "2.0.14",
+    "@types/node": "26.1.2",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "babel-plugin-react-compiler": "1.0.0",
+    "next-validate-link": "1.6.6",
+    "postcss": "8.5.25",
+    "tailwindcss": "4.3.3",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=24.x",
+    "pnpm": ">=11.x"
+  },
+  "packageManager": "pnpm@11.18.0"
+}

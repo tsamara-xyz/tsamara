@@ -1,0 +1,29 @@
+{
+  "pages": [
+    "---For investors---",
+    "introduction",
+    "how-it-works",
+    "try-the-demo",
+    "eligibility",
+    "distributions",
+    "status",
+    "faq",
+    "---For builders---",
+    "builders",
+    "compliance-program",
+    "sukuk-library",
+    "api",
+    "indexer",
+    "testing",
+    "deployment",
+    "contributing",
+    "---Regulation---",
+    "compliance-mapping",
+    "regulation",
+    "---For agents---",
+    "llms-txt",
+    "mcp-server",
+    "---More---",
+    "acknowledgements"
+  ]
+}

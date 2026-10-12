@@ -36,8 +36,9 @@ const ATA_PROGRAM: Pubkey = Pubkey::from_str_const("ATokenGPvbdGVxr1b2hvZbsiqW5x
 /// The two token instructions the classifier looks for; both token programs encode them the same way.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, serde::Serialize)]
 enum TokenIx {
-    FreezeAccount,
-    ThawAccount,
+    /// Each carries the mint the instruction names, so a freeze on some other mint is not mistaken for ours.
+    FreezeAccount(Pubkey),
+    ThawAccount(Pubkey),
 }
 
 impl InstructionDecoderCollection for TokenIx {
@@ -47,9 +48,11 @@ impl InstructionDecoderCollection for TokenIx {
         if ix.program_id != TOKEN_PROGRAM && ix.program_id != TOKEN_2022_PROGRAM {
             return None;
         }
+        // Both instructions take [account, mint, authority].
+        let mint = ix.accounts.get(1)?.pubkey;
         match ix.data.first() {
-            Some(10) => Some(Self::FreezeAccount),
-            Some(11) => Some(Self::ThawAccount),
+            Some(10) => Some(Self::FreezeAccount(mint)),
+            Some(11) => Some(Self::ThawAccount(mint)),
             _ => None,
         }
     }
@@ -87,9 +90,10 @@ impl Processor<TransactionProcessorInputType<'_, TokenIx>> for Indexer {
             instruction_types: data
                 .instructions
                 .iter()
-                .map(|(_, ix)| match ix {
-                    TokenIx::FreezeAccount => "freezeAccount",
-                    TokenIx::ThawAccount => "thawAccount",
+                .filter_map(|(_, ix)| match ix {
+                    TokenIx::FreezeAccount(mint) if mint.to_string() == self.cfg.sukuk_mint => Some("freezeAccount"),
+                    TokenIx::ThawAccount(mint) if mint.to_string() == self.cfg.sukuk_mint => Some("thawAccount"),
+                    _ => None,
                 })
                 .collect(),
         };

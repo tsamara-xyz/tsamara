@@ -1488,6 +1488,159 @@ button.chip.on {
   }
 }
 
+/* Third pass against app.ondo.finance: the typeface, the table and its controls */
+:root {
+  font-family: var(--font), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+}
+
+.card.list {
+  padding: 0 24px;
+}
+
+.card.list .pad {
+  padding-inline: 0;
+}
+
+.tabs {
+  gap: 32px;
+  padding: 0;
+}
+
+.tabs button {
+  padding: 20px 0 18px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.tabs button.on {
+  font-weight: 500;
+}
+
+.tag {
+  padding: 3px 9px;
+  color: var(--ink);
+  background: #ececec;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.filters {
+  padding: 24px 0;
+}
+
+button.chip {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 15px;
+}
+
+button.chip.on {
+  font-weight: 500;
+}
+
+button.chip.wallet {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.view {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.view button {
+  padding: 9px 11px;
+  border-radius: 0;
+}
+
+.view button.on {
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.table th {
+  padding: 14px 12px;
+  border-top: 1px solid var(--line);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.table td {
+  height: 73px;
+  padding: 0 12px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.card.list .table th.num,
+.card.list .table td.num {
+  text-align: left;
+}
+
+.name strong {
+  font-size: 16px;
+}
+
+.name small,
+.feature small {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.table .up {
+  color: #0f7a4f;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.table.compact th,
+.table.compact td {
+  height: 52px;
+  padding: 0 12px 0 0;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.status,
+.status.open {
+  padding: 5px 10px;
+  background: #f4f4f4;
+}
+
+.status.open {
+  color: #0f7a4f;
+}
+
+.status.open::before {
+  width: 8px;
+  height: 8px;
+  background: #0f7a4f;
+  box-shadow: 0 0 0 2px #cfe5d8;
+}
+
+.spark polyline {
+  stroke: #0f7a4f;
+  stroke-width: 1.5;
+}
+
+.spark polygon {
+  fill: rgba(15, 122, 79, 0.12);
+}
+
+code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.feature strong {
+  font-size: 19px;
+}
+
 /* Narrow screens, for the second pass above */
 .detail > div,
 .chart-card {
@@ -1513,5 +1666,29 @@ button.chip.on {
 
   .chart-card .figure {
     font-size: 36px;
+  }
+}
+
+@media (max-width: 640px) {
+  .table.compact th,
+  .table.compact td {
+    height: 44px;
+    font-size: 13px;
+  }
+
+  /* A long row scrolls inside its card instead of widening the page */
+  .card:has(> .table.compact) {
+    overflow-x: auto;
+  }
+}
+
+.tabs button {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .tabs {
+    gap: 20px;
+    overflow-x: auto;
   }
 }

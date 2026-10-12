@@ -1,0 +1,61 @@
+---
+title: Compliance program
+description: The Anchor program Token-2022 calls on every transfer of the sukuk.
+---
+
+`tsamara-compliance` is deployed on devnet at
+[`EjYxuJE4QE8P37scBxgWRHGigZ8hP6j3ysnSQ95MWXXG`](https://explorer.solana.com/address/EjYxuJE4QE8P37scBxgWRHGigZ8hP6j3ysnSQ95MWXXG?cluster=devnet).
+The source is in `contracts/programs/tsamara-compliance`. It is unaudited.
+
+## Instructions
+
+| Instruction | Who may call it | What it does |
+|---|---|---|
+| `initialize_series` | The mint's freeze authority | Writes the series config and the list of extra accounts the hook needs |
+| `register_investor` | The compliance authority | Writes an investor record with a country code; refused if the country is restricted |
+| `transfer_hook` | Token-2022, during a transfer | Checks the recipient and the holding cap |
+
+## Accounts
+
+| Account | Seeds | Holds |
+|---|---|---|
+| `SeriesConfig` | `config`, mint | The compliance authority, the holding cap, up to 16 restricted jurisdictions |
+| `InvestorRecord` | `investor`, mint, wallet | The wallet and its two-letter country code |
+| Extra account metas | `extra-account-metas`, mint | The accounts Token-2022 must pass to the hook |
+
+## What the hook checks
+
+1. It is running inside a token transfer. The source account's `transferring` flag must be set,
+   so the hook cannot be called directly to fake a check.
+2. The recipient has an investor record for this mint. The record is a derived address, so a
+   record for another wallet or another series does not pass.
+3. The recipient's country is not restricted.
+4. The recipient's balance after the transfer does not exceed the holding cap.
+
+## Errors
+
+| Error | Meaning |
+|---|---|
+| Signer is not the mint's freeze authority | Someone other than the compliance authority tried to initialize or register |
+| Too many restricted jurisdictions | More than 16 |
+| The series is not offered to residents of this jurisdiction | Restricted country, at registration or on transfer |
+| Transfer would exceed the per-investor holding cap | The recipient would hold more than the cap |
+| The hook may only run during a token transfer | The hook was called outside a transfer |
+
+## Known limits
+
+- The hook does not run on mint, so the cap is not enforced by the program on a primary
+  subscription ([issue 21](https://github.com/tsamara-xyz/tsamara/issues/21)).
+- There is no instruction to change a series' rules after it is initialized.
+- The compliance authority is the mint's permanent delegate. The program does not constrain how
+  that key is used.
+
+## Build
+
+Install the Solana CLI and Anchor, then:
+
+```sh
+cd contracts
+anchor build
+bun run build     # also refreshes the binary the tests load
+```

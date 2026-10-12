@@ -1,0 +1,31 @@
+---
+title: Testing
+description: What each layer of tests covers and how to run it.
+---
+
+| Layer | What it covers | Run |
+|---|---|---|
+| Program, unit (Rust) | Jurisdiction matching and account sizing | `cargo test --lib` in `contracts/` |
+| Program, integration | The compiled program with the TypeScript library, in-process on LiteSVM: who may initialize and register, transfers through the hook, the cap at its boundary | `bun test contracts` |
+| Program, regression and security | The hook refuses to run outside a transfer, a forged recipient is rejected, revoked investors cannot move units, and the known minting gap is pinned | `bun test contracts` |
+| Library, unit | Distribution math, settlement amounts and token programs, instruction encoding, eligibility | `bun test packages` |
+| Indexer, unit (Rust) | Event classification and exactly-once storage | `cargo test --manifest-path apps/indexer/Cargo.toml` |
+| App, unit and regression | Derived figures, error explanations, request shape | `bun test apps/app` |
+| End to end, devnet | The full lifecycle with assertions; the API flow including Sumsub | `bun run demo`, `bun apps/api/smoke.ts` |
+| End to end, browser | Chrome drives the app against devnet: connect, fund, approval, subscribe, portfolio, transfer, and a refused transfer | `bun apps/app/e2e/investor-flow.ts` |
+
+`bun test` runs every TypeScript suite and needs no network.
+
+The program tests load `contracts/tests/fixtures/tsamara_compliance.so`. Run
+`bun run --cwd contracts build` after changing the program, so they do not test a stale binary.
+
+## Against a deployment
+
+```sh
+API=https://api.tsamara.xyz INDEXER=https://indexer.tsamara.xyz ADMIN_TOKEN=... bun apps/api/smoke.ts
+```
+
+## Continuous integration
+
+Every pull request runs three jobs: lint, typecheck and the TypeScript suites; the indexer's
+Rust tests; and the program's tests.

@@ -1,0 +1,35 @@
+---
+title: Contributing
+description: How changes are made in this repository.
+---
+
+## The flow
+
+Every change starts as an issue and lands as a pull request with labels, in small commits, with
+CI green. Pull requests are rebased onto `main`.
+
+## Before you push
+
+```sh
+bun run lint        # Biome
+bun run typecheck
+bun test
+```
+
+Husky runs the lint on commit and the typecheck and tests on push. If you changed the program,
+rebuild the test binary with `bun run --cwd contracts build`. The docs are a separate pnpm
+project: run `pnpm lint` and `pnpm build` in `apps/docs`.
+
+## Style
+
+- The least code that does the job. A shortcut taken on purpose is marked with a `ponytail:`
+  comment naming its ceiling and the upgrade path.
+- A fix goes where every caller passes through, with one test that fails without it.
+
+## Wording
+
+What the product says matters as much as what it does. Never write that Tsamara is compliant,
+regulated, sharia-compliant, halal or guaranteed, and never call the return a coupon or
+interest. The table of what to say instead is in
+[Regulatory and sharia notes](/docs/regulation#what-we-must-not-say). No invented market data in
+the interface.

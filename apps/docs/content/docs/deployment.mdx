@@ -1,0 +1,43 @@
+---
+title: Deployment
+description: Five containers, one per service, each configured from the environment.
+---
+
+| Service | Dockerfile | Build context | Port | Public URL |
+|---|---|---|---|---|
+| Landing | `apps/landing/Dockerfile` | repository root | 80 | `tsamara.xyz` |
+| App | `apps/app/Dockerfile` | repository root | 3000 | `app.tsamara.xyz` |
+| API | `apps/api/Dockerfile` | repository root | 8788 | `api.tsamara.xyz` |
+| Indexer | `apps/indexer/Dockerfile` | `apps/indexer` | 8787 | `indexer.tsamara.xyz` |
+| Docs | `apps/docs/Dockerfile` | `apps/docs` | 3000 | `docs.tsamara.xyz` |
+
+## Configuration
+
+| Service | Variable | Meaning |
+|---|---|---|
+| App, at build time | `NEXT_PUBLIC_API`, `NEXT_PUBLIC_INDEXER` | Public URLs of the API and the indexer |
+| App, at build time | `NEXT_PUBLIC_RPC` | Optional Solana RPC endpoint; defaults to public devnet |
+| API | `ISSUER_KEY`, `COMPLIANCE_KEY` | Operator keys as JSON byte arrays. Devnet keys only |
+| API | `SUKUK_MINT`, `PAYMENT_MINT` | The live series to serve |
+| API | `ADMIN_TOKEN` | Required by the admin routes |
+| API | `INDEXER` | URL of the indexer, for the holder list |
+| API | `SUMSUB_TOKEN`, `SUMSUB_SECRET` | Optional sandbox credentials |
+| API, Indexer | `RPC` | Optional Solana RPC endpoint |
+| Indexer | `SUKUK_MINT`, `PAYMENT_MINT`, `ISSUER` | The series to index |
+| Docs | `NEXT_PUBLIC_SITE_URL` | Optional canonical origin |
+
+## The current deployment
+
+The services run on one server under [Coolify](https://coolify.io), built from `main` with the
+Dockerfiles above. The server's nginx proxies each hostname to a port published on the host.
+
+Things that are easy to get wrong:
+
+- **The API reaches the indexer over the Docker network**, by a network alias. An alias takes
+  effect on a full deploy, not a restart.
+- **The app's public URLs are build variables.** Changing them means rebuilding it.
+- **The indexer answers only after it has caught up**, a little after its container starts.
+- **The app waits.** If the API is unreachable, pages say so and retry every few seconds, so a
+  restart of the server needs no reload from visitors.
+
+The repository's `docs/DEPLOY.md` has the rest.

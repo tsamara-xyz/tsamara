@@ -1490,7 +1490,8 @@ button.chip.on {
 
 /* Third pass against app.ondo.finance: the typeface, the table and its controls */
 :root {
-  font-family: var(--font), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Gellix first: it is only declared when licensed files are present, otherwise Figtree is used */
+  font-family: Gellix, var(--font), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 16px;
 }
 

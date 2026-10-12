@@ -1,0 +1,4 @@
+# A standalone project, like apps/docs: not part of the Bun workspace.
+allowBuilds:
+  esbuild: true
+  "@remotion/compositor-darwin-arm64": true

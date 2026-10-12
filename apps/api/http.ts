@@ -48,6 +48,21 @@ export function rateLimiter(max: number, windowMs: number) {
   };
 }
 
+/**
+ * Amounts promised per key that expire after `ttlMs`. `total` is what is still promised; `add` promises more.
+ */
+// ponytail: in memory, like the limiter above; a restart forgets promises that are at most `ttlMs` old.
+export function reservations(ttlMs: number) {
+  const held = new Map<string, { amount: bigint; expires: number }[]>();
+  const live = (key: string, now: number) => (held.get(key) ?? []).filter((r) => r.expires > now);
+  return {
+    total: (key: string, now = Date.now()) => live(key, now).reduce((sum, r) => sum + r.amount, 0n),
+    add: (key: string, amount: bigint, now = Date.now()) => {
+      held.set(key, [...live(key, now), { amount, expires: now + ttlMs }]);
+    },
+  };
+}
+
 /** The caller's address as the proxy in front of the API reports it. */
 export const callerOf = (c: Context): string =>
   c.req.header("cf-connecting-ip") ?? c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";

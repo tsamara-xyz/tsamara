@@ -3,8 +3,9 @@ title: The sukuk library
 description: packages/sukuk builds every instruction Tsamara sends.
 ---
 
-`@tsamara/sukuk` is a TypeScript package of pure instruction builders on `@solana/web3.js` and
-`@solana/spl-token`. It signs nothing and sends nothing: the caller decides who signs.
+`@tsamara/sukuk` is a TypeScript package of instruction builders on `@solana/web3.js` and
+`@solana/spl-token`. It signs nothing and sends nothing: the caller decides who signs. A few
+builders read from the chain to resolve accounts, and take a `Connection` for that.
 
 ## A series
 
@@ -14,8 +15,8 @@ description: packages/sukuk builds every instruction Tsamara sends.
 
 | Function | Use |
 |---|---|
-| `issueSeriesIxs` | Create the mint with its extensions and publish the terms as metadata |
-| `publishTermsIxs` | Write or update the metadata fields |
+| `issueSeriesIxs` | Create the mint with its extensions, its name and its symbol |
+| `publishTermsIxs` | Write the terms as metadata fields, in a second transaction |
 | `initializeComplianceIx` | Create the series config for the transfer hook |
 | `isEligible` | Whether a country may hold the series |
 | `isTradableAtAgreedPrice` | Whether tangible assets are at least 51% |
@@ -51,7 +52,9 @@ token program works.
 ## Recovery
 
 `forcedTransferIxs` moves units using the permanent delegate. It refuses to build the transfer
-without a `reason` and an `orderedBy`, and adds a memo carrying both.
+without a `reason` and an `orderedBy`, and adds a memo carrying both. If the source account is
+frozen, as a revoked investor's is, it thaws it for the transfer and freezes it again in the same
+transaction.
 
 ## Example
 

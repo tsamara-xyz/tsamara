@@ -26,8 +26,9 @@ Each batch carries a memo naming the series, the period and the batch number:
 tsamara:distribution:GSD31:2026-H2:0
 ```
 
-Before sending a batch, the API looks for its memo on the treasury's history and skips the
-batch if it is there. Paying the same period again therefore pays nobody twice, and a run that
+Before sending a batch, the API looks on the treasury's history for a transaction that carries
+exactly that memo and was signed by the issuer, and skips the batch if there is one. The memo
+alone would prove nothing: anyone can send dust to the treasury with any memo. Paying the same period again therefore pays nobody twice, and a run that
 failed halfway can simply be repeated.
 
 <Callout type="info">

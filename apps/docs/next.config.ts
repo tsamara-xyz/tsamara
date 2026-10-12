@@ -7,6 +7,21 @@ const withMDX = createMDX();
 const config: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  poweredByHeader: false,
+  headers: async () => [
+    {
+      source: '/:path*',
+      headers: [
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'X-Frame-Options', value: 'DENY' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        {
+          key: 'Strict-Transport-Security',
+          value: 'max-age=31536000; includeSubDomains'
+        }
+      ]
+    }
+  ],
   reactCompiler: true,
   serverExternalPackages: ['@takumi-rs/core'],
   images: {

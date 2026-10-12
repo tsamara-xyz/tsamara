@@ -85,7 +85,7 @@ export const api = {
   kyc: (token: string, wallet: string, jurisdiction: string) =>
     request<{ signature: string }>(API, "/admin/kyc", { wallet, jurisdiction }, token),
   distribute: (token: string, period: string) =>
-    request<{ batches: { memo: string; skipped: boolean; signature: string | null }[] }>(
+    request<{ batches: { memo: string; skipped: boolean; signature: string | null; error?: string }[] }>(
       API,
       "/admin/distribute",
       { period },

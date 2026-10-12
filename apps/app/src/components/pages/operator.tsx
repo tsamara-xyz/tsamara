@@ -93,6 +93,11 @@ export function OperatorPage() {
               const period = field(e.currentTarget, "period");
               run(`Distribution for ${period} paid; batches already paid were skipped`, async () => {
                 const { batches } = await api.distribute(token, period);
+                const failed = batches.filter((b) => b.error);
+                if (failed.length > 0)
+                  throw new Error(
+                    `${failed.length} of ${batches.length} batches failed (${failed[0]?.error}). The others were paid; run the period again to retry.`,
+                  );
                 return batches.find((b) => b.signature)?.signature ?? undefined;
               });
             }}

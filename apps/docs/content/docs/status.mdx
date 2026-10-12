@@ -1,0 +1,52 @@
+---
+title: Status
+description: What is deployed, what has been proven, and what is not true yet.
+---
+
+## Deployed, on Solana devnet
+
+| | |
+|---|---|
+| Compliance program | [`EjYxuJE4…WXXG`](https://explorer.solana.com/address/EjYxuJE4QE8P37scBxgWRHGigZ8hP6j3ysnSQ95MWXXG?cluster=devnet) |
+| App | [app.tsamara.xyz](https://app.tsamara.xyz) |
+| Operator API | `api.tsamara.xyz` |
+| Indexer | `indexer.tsamara.xyz` |
+| Landing | [tsamara.xyz](https://tsamara.xyz) |
+
+The addresses of the live demo series (sukuk token, payment token, issuer) are on its
+[asset page](https://app.tsamara.xyz/assets/gsd31), each linked to Solana Explorer.
+
+## Proven
+
+- **The whole lifecycle, on devnet.** Issue a series, approve investors, subscribe, transfer,
+  pay a distribution, with assertions on the balances after each step.
+- **The rules hold against attempts to break them.** Tests run the compiled program and try a
+  transfer to an unregistered wallet, a forged recipient, a transfer over the cap, a revoked
+  investor, and the hook called outside a transfer. Each is refused.
+- **A real browser can do it.** A script drives Chrome through connect, fund, approval,
+  subscribe, portfolio, transfer and a refused transfer, against devnet.
+- **Identity verification end to end, in the sandbox.** A German test applicant is approved
+  onchain; applicants from the United States and Indonesia are refused.
+- **A distribution repeated is paid once.**
+
+See [Testing](/docs/testing) for how to run each of these.
+
+## Not true yet
+
+- **No licence, no regulatory approval, no sharia certification.** No sharia board has reviewed
+  the structure.
+- **The token represents nothing.** There is no underlying sukuk, no custodian, no trust or
+  wakalah arrangement, and no affiliation with any sovereign issuer.
+- **Not audited.** The compliance program has had no professional security review.
+- **Single keys.** The issuer and compliance authorities are single keys held by the operator's
+  API, not a multisig.
+- **The holding cap is not enforced by the program on a primary subscription**, only by the API.
+- **Tangibility is published, not enforced.** Nothing updates the ratio or restricts transfers
+  to par when it falls.
+- **Sandbox identity checks only**, with no sanctions or AML screening.
+- **Devnet only.**
+
+The gaps are tracked as issues labelled
+[`compliance`](https://github.com/tsamara-xyz/tsamara/labels/compliance) and
+[`production`](https://github.com/tsamara-xyz/tsamara/labels/production), and mapped in
+[Compliance mapping](/docs/compliance-mapping).

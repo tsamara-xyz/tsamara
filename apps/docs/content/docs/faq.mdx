@@ -1,0 +1,56 @@
+---
+title: FAQ
+description: Short answers, with the caveats kept.
+---
+
+## What is Tsamara, in plain words?
+
+A prototype that represents a sukuk series as a token with a $10 unit on Solana. Approved
+investors can subscribe with stablecoins, transfer units to each other and receive
+distributions, and the rules about who may hold units are enforced by programs onchain.
+
+## Can I invest real money?
+
+No. It runs on devnet with a mock series and test dollars that have no value. Nothing here is an
+offer of securities.
+
+## Is this a real sovereign sukuk?
+
+No. The demo series is a mock, and Tsamara is not affiliated with any sovereign issuer. Only a
+sovereign's own issuer can issue its sukuk. A real Tsamara would issue units representing a
+beneficial share in sukuk held on trust.
+
+## Is it certified by a sharia board?
+
+No. It is designed with sharia principles in mind: the return is an expected profit
+distribution, not interest, and the share of tangible assets is published. It has not been
+reviewed or certified by any sharia board.
+
+## Is the return fixed?
+
+No. The series has an expected profit rate set by its structure. It is an expectation.
+
+## Who can hold units?
+
+Only wallets the compliance authority has registered, in a jurisdiction the series is offered
+in. See [Eligibility and transfers](/docs/eligibility).
+
+## Why is the demo series not offered in the United States or Indonesia?
+
+A public offer in the United States needs registration. In Indonesia the rupiah is mandatory for
+domestic transactions, and this series settles in a stablecoin.
+
+## Can someone take my units?
+
+The compliance authority can move units without the holder's signature, for lost keys,
+inheritance, or an order from a court or regulator. Each such transfer is recorded onchain with
+its reason and the authority that ordered it. In the prototype that authority is a single key.
+
+## Why Solana?
+
+Token-2022 provides the pieces as standard features: accounts frozen by default, a hook on every
+transfer, metadata on the mint, and atomic transactions for delivery versus payment.
+
+## Is it audited?
+
+No.

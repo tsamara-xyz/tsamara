@@ -1,0 +1,53 @@
+---
+title: Eligibility and transfers
+description: Who may hold units, what every transfer is checked against, and what the compliance authority can do.
+---
+
+## Who may hold units
+
+An investor holds units only after two things have happened onchain: the compliance authority
+has written an investor record for their wallet, with a country code, and it has opened their
+sukuk account, which starts frozen.
+
+Registration is refused if the country is on the series' restricted list. The demo series is not
+offered to residents of the United States or Indonesia. Indonesia is on the list because the
+series settles in a stablecoin, and the rupiah is mandatory for domestic transactions there.
+
+## How identity is checked
+
+Verification runs through Sumsub, with an identity document and a liveness check. The widget in
+the browser is only the interface. The decision is taken by the operator's API, which reads
+Sumsub's own record of the verdict and the document's country, and registers the investor only
+then.
+
+<Callout type="warn">
+The prototype uses Sumsub's sandbox, and the API refuses production credentials. The country is
+the document's country, not proven residence. Sanctions and AML screening are not configured.
+Identity checks and an allow-list are necessary for a real offering. They are not sufficient.
+</Callout>
+
+## What every transfer is checked against
+
+On each transfer of units, the compliance program refuses unless:
+
+- the recipient has an investor record for this series,
+- the recipient's country is not restricted,
+- the recipient's balance after the transfer is within the holding cap.
+
+A revoked investor's account is frozen, so they can neither send nor receive.
+
+## What the compliance authority can do
+
+It can freeze an account. It can also move units without the holder's signature, for lost keys,
+inheritance, or an order from a court or regulator. The library refuses to build such a transfer
+without a reason and the authority that ordered it, and writes both onchain with the transfer.
+The recipient must still be a registered investor within the holding cap.
+
+Nothing onchain stops whoever holds that key from using it directly, so this control rests on
+who holds the key. Holding it in a multisig is designed and not built
+([issue 19](https://github.com/tsamara-xyz/tsamara/issues/19)).
+
+## What is stored about you
+
+The chain stores a wallet address and a two-letter country code per investor, and no other
+personal data.

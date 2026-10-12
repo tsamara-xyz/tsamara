@@ -1,0 +1,38 @@
+[
+  {
+    "id": "explore",
+    "at": 0.547
+  },
+  {
+    "id": "asset",
+    "at": 21.661
+  },
+  {
+    "id": "fund",
+    "at": 42.856
+  },
+  {
+    "id": "approve",
+    "at": 46.719
+  },
+  {
+    "id": "subscribe",
+    "at": 51.596
+  },
+  {
+    "id": "portfolio",
+    "at": 57.2
+  },
+  {
+    "id": "refusal",
+    "at": 78.16
+  },
+  {
+    "id": "distribution",
+    "at": 83.793
+  },
+  {
+    "id": "end",
+    "at": 110.51
+  }
+]

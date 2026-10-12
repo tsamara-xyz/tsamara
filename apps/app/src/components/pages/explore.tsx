@@ -34,30 +34,32 @@ export function ExplorePage() {
 
   return (
     <>
-      <section className="card strip">
-        <div>
-          <p className="label">Total Portfolio Value</p>
-          <p className="big">{wallet ? usd(value, decimals) : "$0.00"}</p>
-        </div>
-        <dl className="mini">
+      {wallet && (
+        <section className="card strip">
           <div>
-            <dt>Units</dt>
-            <dd>{String(position?.units ?? 0n)}</dd>
+            <p className="label">Total Portfolio Value</p>
+            <p className="big">{usd(value, decimals)}</p>
           </div>
-          <div>
-            <dt>Test dollars</dt>
-            <dd>{usd(position?.dollars ?? 0n, decimals)}</dd>
-          </div>
-          <div>
-            <dt>KYC</dt>
-            <dd>{position?.registered ? "Approved" : wallet ? "Not approved" : "—"}</dd>
-          </div>
-        </dl>
-        <Sparkline points={chart} width={220} height={44} />
-        <Link className="more" href="/portfolio">
-          View Portfolio →
-        </Link>
-      </section>
+          <dl className="mini">
+            <div>
+              <dt>Units</dt>
+              <dd>{String(position?.units ?? 0n)}</dd>
+            </div>
+            <div>
+              <dt>Test dollars</dt>
+              <dd>{usd(position?.dollars ?? 0n, decimals)}</dd>
+            </div>
+            <div>
+              <dt>KYC</dt>
+              <dd>{position?.registered ? "Approved" : "Not approved"}</dd>
+            </div>
+          </dl>
+          <Sparkline points={chart} width={220} height={44} />
+          <Link className="more" href="/portfolio">
+            View Portfolio →
+          </Link>
+        </section>
+      )}
 
       <section className="hero">
         <div>

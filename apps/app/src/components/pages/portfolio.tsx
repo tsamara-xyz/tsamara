@@ -98,7 +98,9 @@ export function PortfolioPage() {
             ))}
           </div>
         </div>
-        <AreaChart points={points} format={(v) => usd(BigInt(Math.round(v)), decimals)} />
+        <div className="chart-scroll">
+          <AreaChart points={points} format={(v) => usd(BigInt(Math.round(v)), decimals)} />
+        </div>
         <p className="muted small">
           The chart tracks sukuk holdings at par, from indexed transactions; the figure above also counts test dollars.
           Distributions received so far: {usd(received, decimals)}.

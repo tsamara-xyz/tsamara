@@ -193,7 +193,7 @@ export function PortfolioPage() {
       <section className="card">
         <div className="card-head">
           <div>
-            <h3>Investors Also Own</h3>
+            <h3>Other series</h3>
             <p className="muted small">Series in the catalogue. Preview series are not issued and cannot be bought.</p>
           </div>
           <Link className="btn soft" href="/">

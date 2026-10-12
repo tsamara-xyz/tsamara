@@ -9,7 +9,7 @@ import { Activity } from "../activity-table";
 import { AssetCard } from "../asset-card";
 import { AreaChart } from "../chart";
 import { useStore } from "../store";
-import { AssetIcon, ConnectButtons, EmptyState } from "../ui";
+import { AssetIcon, ConnectButtons, EmptyState, SeriesPending } from "../ui";
 
 type AssetClass = "all" | "cash" | "sukuk";
 
@@ -35,7 +35,7 @@ export function PortfolioPage() {
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => setNow(Math.floor(Date.now() / 1000)), []);
 
-  if (!series) return <p className="muted pad">Loading series…</p>;
+  if (!series) return <SeriesPending />;
   if (!wallet) {
     return (
       <section className="card center">
@@ -83,13 +83,12 @@ export function PortfolioPage() {
       <section className="card">
         <div className="value-head">
           <Figure amount={usd(total, decimals)} />
-          <div className="ranges" role="tablist" aria-label="Chart range">
+          <div className="ranges">
             {(Object.keys(RANGES) as Range[]).map((r) => (
               <button
                 type="button"
                 key={r}
-                role="tab"
-                aria-selected={range === r}
+                aria-pressed={range === r}
                 className={range === r ? "on" : ""}
                 onClick={() => setRange(r)}
               >

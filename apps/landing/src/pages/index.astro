@@ -3,6 +3,7 @@ import "../styles/cinema.css";
 
 const APP = "https://app.tsamara.xyz";
 const REPO = "https://github.com/tsamara-xyz/tsamara";
+const DOCS = "https://docs.tsamara.xyz";
 
 const scene = "https://raft-blast-61784561.figma.site/_assets/v11";
 const icons = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P";
@@ -55,6 +56,15 @@ const cards: Card[] = [
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#0b1110" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tsamara.xyz" />
+    <meta property="og:title" content="Tsamara: sovereign sukuk in $10 units" />
+    <meta
+      property="og:description"
+      content="A devnet prototype: sukuk in $10 units on Solana, with every transfer rule enforced onchain."
+    />
+    <meta property="og:image" content="https://tsamara.xyz/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
     <main class="site-shell">
@@ -71,7 +81,8 @@ const cards: Card[] = [
               <nav class="site-nav" aria-label="Main menu">
                 <a href="#cinema">Intro</a>
                 <a href={REPO}>GitHub</a>
-                <a href={`${REPO}#how-it-works`}>How it works</a>
+                <a href={`${DOCS}/docs/how-it-works`}>How it works</a>
+                <a href={DOCS}>Docs</a>
               </nav>
               <a class="header-cta" href={APP}>
                 <span>Launch app</span>

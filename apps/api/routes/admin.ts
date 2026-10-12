@@ -1,9 +1,9 @@
 // Operator-only routes, behind the admin token.
-import { distributionIxs, forcedTransferIxs } from "@tsamara/sukuk";
+import { distributionBatches, forcedTransferIxs } from "@tsamara/sukuk";
 import { Hono } from "hono";
 import { fail, json, parseUnits, parseWallet } from "../http";
 import { applicant, sandboxReview } from "../kyc";
-import { approveOnchain, holders } from "../ledger";
+import { approveOnchain, holders, paidMemos } from "../ledger";
 import { compliance, conn, issuer, payment, send, sukukMint, terms } from "../series";
 
 export function adminRoutes(adminToken: string): Hono {
@@ -31,10 +31,20 @@ export function adminRoutes(adminToken: string): Hono {
     return c.json({ reviewAnswer });
   });
 
+  // Pays one period's distribution in batches. Each batch carries a memo naming the period, and a batch
+  // whose memo is already on the treasury's history is skipped, so repeating a period pays nobody twice.
   admin.post("/distribute", async (c) => {
-    const { ixs, payouts } = distributionIxs(payment, issuer.publicKey, await holders(), terms);
-    if (ixs.length === 0) fail(422, "No holders to pay");
-    return c.json(json({ signature: await send(ixs, [issuer]), payouts }));
+    const period = String((await c.req.json().catch(() => ({}))).period ?? "");
+    if (!/^[A-Za-z0-9-]{1,16}$/.test(period)) fail(400, "period is required: 1 to 16 letters, digits or dashes");
+    const batches = distributionBatches(payment, issuer.publicKey, await holders(), terms, period);
+    if (batches.length === 0) fail(422, "No holders to pay");
+    const paid = await paidMemos();
+    const results = [];
+    for (const batch of batches) {
+      const done = paid.some((memo) => memo.includes(batch.memo));
+      results.push({ memo: batch.memo, skipped: done, signature: done ? null : await send(batch.ixs, [issuer]) });
+    }
+    return c.json(json({ period, batches: results, payouts: batches.flatMap((b) => b.payouts) }));
   });
 
   // Moves units without the holder's signature. For lost keys, inheritance and court or regulator orders;

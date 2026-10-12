@@ -34,6 +34,7 @@ export function KycDialog({ onClose }: { onClose: () => void }) {
   const [phase, setPhase] = useState<"loading" | "widget" | "checking" | "approved" | "failed">("loading");
   const [message, setMessage] = useState("");
   const container = useRef<HTMLDivElement>(null);
+  const close = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!address) return;
@@ -95,6 +96,13 @@ export function KycDialog({ onClose }: { onClose: () => void }) {
     };
   }, [address, refresh]);
 
+  useEffect(() => {
+    close.current?.focus();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   const checkNow = async () => {
     const result = await api.kycComplete(address).catch(() => null);
     if (result?.status !== "approved") return;
@@ -107,7 +115,7 @@ export function KycDialog({ onClose }: { onClose: () => void }) {
       <div className="dialog" role="dialog" aria-modal="true" aria-label="Verify your identity">
         <header>
           <h2>Verify your identity</h2>
-          <button type="button" className="link" onClick={onClose} aria-label="Close">
+          <button type="button" className="link" onClick={onClose} aria-label="Close" ref={close}>
             ✕
           </button>
         </header>
@@ -115,7 +123,12 @@ export function KycDialog({ onClose }: { onClose: () => void }) {
           Verification is run by Sumsub in sandbox mode. Approval is recorded onchain for {short(address)}.
         </p>
         {phase === "approved" && (
-          <p className="notice ok">Approved. Your investor record is onchain and your sukuk account is open.</p>
+          <>
+            <p className="notice ok">Approved. Your investor record is onchain and your sukuk account is open.</p>
+            <button type="button" className="btn primary wide" onClick={onClose}>
+              Continue to subscribe
+            </button>
+          </>
         )}
         {phase === "failed" && <p className="notice error">{message}</p>}
         {phase === "checking" && (

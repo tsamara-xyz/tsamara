@@ -1,6 +1,6 @@
 # Deployment
 
-Four containers, one per service. Each has a Dockerfile and reads its configuration from the environment.
+Five containers, one per service. Each has a Dockerfile and reads its configuration from the environment.
 
 | Service | Dockerfile | Build context | Port | Public URL |
 |---|---|---|---|---|
@@ -8,6 +8,7 @@ Four containers, one per service. Each has a Dockerfile and reads its configurat
 | App | `apps/app/Dockerfile` | repository root | 3000 | https://app.tsamara.xyz |
 | API | `apps/api/Dockerfile` | repository root | 8788 | https://api.tsamara.xyz |
 | Indexer | `apps/indexer/Dockerfile` | `apps/indexer` | 8787 | https://indexer.tsamara.xyz |
+| Docs | `apps/docs/Dockerfile` | `apps/docs` | 3000 | https://docs.tsamara.xyz |
 
 ## Configuration
 
@@ -29,7 +30,7 @@ The series is created once by starting the API locally with funded devnet keys (
 
 ## Current deployment
 
-The four services run on a single VPS under Coolify, in a project named `tsamara`, built from `main` of this repository with the Dockerfiles above. The server's own nginx terminates TLS and proxies each hostname to a port published on the host.
+The five services run on a single VPS under Coolify, in a project named `tsamara`, built from `main` of this repository with the Dockerfiles above. The server's own nginx terminates TLS and proxies each hostname to a port published on the host.
 
 | Service | Coolify application | Host port |
 |---|---|---|
@@ -37,6 +38,7 @@ The four services run on a single VPS under Coolify, in a project named `tsamara
 | App | `tsamara-app` | 3114 |
 | API | `tsamara-api` | 3112 |
 | Indexer | `tsamara-indexer` | 3111 |
+| Docs | `tsamara-docs` | 3115 |
 
 Things that are easy to get wrong:
 

@@ -21,6 +21,10 @@ app.onError((err, c) => {
 app.route("/", investor);
 app.route("/admin", adminRoutes(ADMIN_TOKEN));
 
+// The Solana client can reject in the background (a dropped websocket, a rate-limited confirmation poll)
+// after the request that started it has already been answered. That must not take the server down.
+process.on("unhandledRejection", (reason) => console.error("unhandled rejection:", reason));
+
 const server = Bun.serve({ port: Number(process.env.API_PORT ?? 8788), fetch: app.fetch });
 console.log(`Operator API on http://localhost:${server.port} for series ${sukukMint.toBase58()}`);
 console.log(`Admin token: ${ADMIN_TOKEN}`);

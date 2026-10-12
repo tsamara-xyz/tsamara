@@ -45,7 +45,7 @@ This is an engineering document, not legal advice. The legal and sharia position
 | Public, tamper-evident terms | Akad, maturity, currency, profit rate, unit size, restrictions and holding cap are stored in the token's metadata | Onchain |
 | Audit trail | Every approval, subscription, transfer and distribution is a confirmed transaction; the indexer derives a per-wallet history from them | Onchain, read through tooling |
 | Accurate pro rata distributions | Integer math, rounded down, unit-tested; holders are read from the indexer | Tooling |
-| A distribution cannot be paid twice | Not guarded; a retry would pay again ([#23](https://github.com/tsamara-xyz/tsamara/issues/23)) | Designed |
+| A distribution cannot be paid twice | Each batch is written onchain with a memo naming the series, the period and the batch; the API skips a batch whose memo is already on the treasury's history. If holdings change between a failed run and its retry, batch boundaries can move, so a record-date snapshot is still needed for a series larger than one batch | Tooling |
 | Settlement asset | A mock dollar token on devnet; a real stablecoin on the same token program works without code changes. Stablecoin settlement is not permitted everywhere: in Indonesia the rupiah is mandatory for domestic transactions | External |
 | Registry of record | The chain is the registry in this design; whether that is legally sufficient depends on the jurisdiction | External |
 

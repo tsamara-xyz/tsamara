@@ -44,7 +44,7 @@ page.on("pageerror", (e) => failures.push(`page error: ${e.message}`));
 try {
   await page.goto(APP);
   await page.getByRole("heading", { name: "Sovereign Sukuk in $10 Units" }).waitFor();
-  await page.getByRole("button", { name: "Connect" }).click();
+  await page.getByRole("button", { name: "Connect test wallet" }).click();
   const address = await page.locator(".chip[title]").getAttribute("title");
   assert.ok(address, "the connected wallet's address is shown");
   step(`test wallet connected: ${address}`);

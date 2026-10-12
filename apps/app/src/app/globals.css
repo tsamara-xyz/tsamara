@@ -207,6 +207,10 @@ main > *,
   color: var(--up);
 }
 
+.warn {
+  color: #b42318;
+}
+
 .num {
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -1065,6 +1069,10 @@ button.chip {
   color: var(--muted);
   background: none;
   cursor: pointer;
+}
+
+button.chip.wallet {
+  color: var(--ink);
 }
 
 button.chip.on {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { short } from "@/lib/chain";
 import { useStore } from "./store";
 import { NoticeBar } from "./ui";
@@ -12,6 +12,33 @@ const LINKS = [
   { href: "/portfolio", label: "Portfolio" },
   { href: "/operator", label: "Operator" },
 ];
+
+/** The connected wallet: click to copy the address (the operator needs it), or disconnect. */
+function WalletChip({ address, label }: { address: string; label: string }) {
+  const { disconnect } = useStore();
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    await navigator.clipboard.writeText(address);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <>
+      <button
+        type="button"
+        className="chip wallet"
+        title={address}
+        onClick={copy}
+        aria-label={`Copy address ${address}`}
+      >
+        {copied ? "Address copied" : `${label} · ${short(address)} ⧉`}
+      </button>
+      <button type="button" className="link" onClick={disconnect} aria-label="Disconnect wallet" title="Disconnect">
+        ✕
+      </button>
+    </>
+  );
+}
 
 function TopNav() {
   const { wallet, connect, busy, search, setSearch } = useStore();
@@ -24,7 +51,12 @@ function TopNav() {
       </Link>
       <nav>
         {LINKS.map((link) => (
-          <Link key={link.href} href={link.href} className={pathname === link.href ? "active" : ""}>
+          <Link
+            key={link.href}
+            href={link.href}
+            className={pathname === link.href ? "active" : ""}
+            aria-current={pathname === link.href ? "page" : undefined}
+          >
             {link.label}
           </Link>
         ))}
@@ -42,12 +74,13 @@ function TopNav() {
       />
       <span className="chip">Devnet</span>
       {wallet ? (
-        <span className="chip" title={wallet.publicKey.toBase58()}>
-          {wallet.kind === "burner" ? "Test wallet" : "Phantom"} · {short(wallet.publicKey.toBase58())}
-        </span>
+        <WalletChip
+          address={wallet.publicKey.toBase58()}
+          label={wallet.kind === "burner" ? "Test wallet" : "Phantom"}
+        />
       ) : (
         <button type="button" className="btn dark" disabled={busy} onClick={() => connect("burner")}>
-          Connect
+          Connect test wallet
         </button>
       )}
     </header>

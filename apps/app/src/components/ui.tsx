@@ -2,6 +2,7 @@
 
 // Small presentational pieces shared by every page.
 import type { ReactNode } from "react";
+import { RANGES, type Range } from "@/lib/activity";
 import { explorer } from "@/lib/chain";
 import { useStore } from "./store";
 
@@ -42,6 +43,24 @@ export function Sparkline({
       <polygon points={`0,${height} ${line} ${width},${height}`} />
       <polyline points={line} />
     </svg>
+  );
+}
+
+export function RangeTabs({ value, onChange }: { value: Range; onChange: (range: Range) => void }) {
+  return (
+    <div className="ranges">
+      {(Object.keys(RANGES) as Range[]).map((r) => (
+        <button
+          type="button"
+          key={r}
+          aria-pressed={value === r}
+          className={value === r ? "on" : ""}
+          onClick={() => onChange(r)}
+        >
+          {r}
+        </button>
+      ))}
+    </div>
   );
 }
 

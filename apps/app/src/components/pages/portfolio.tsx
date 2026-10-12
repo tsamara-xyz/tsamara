@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { holdingHistory, inRange, outstandingSeries, RANGES, type Range } from "@/lib/activity";
+import { holdingHistory, inRange, outstandingSeries, type Range } from "@/lib/activity";
 import { assetsFor, rate } from "@/lib/assets";
 import { short, usd } from "@/lib/chain";
 import { Activity } from "../activity-table";
 import { AssetCard } from "../asset-card";
 import { AreaChart } from "../chart";
 import { useStore } from "../store";
-import { AssetIcon, ConnectButtons, EmptyState, SeriesPending } from "../ui";
+import { AssetIcon, ConnectButtons, EmptyState, RangeTabs, SeriesPending } from "../ui";
 
 type AssetClass = "all" | "cash" | "sukuk";
 
@@ -83,22 +83,14 @@ export function PortfolioPage() {
       <section className="card">
         <div className="value-head">
           <Figure amount={usd(total, decimals)} />
-          <div className="ranges">
-            {(Object.keys(RANGES) as Range[]).map((r) => (
-              <button
-                type="button"
-                key={r}
-                aria-pressed={range === r}
-                className={range === r ? "on" : ""}
-                onClick={() => setRange(r)}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
+          <RangeTabs value={range} onChange={setRange} />
         </div>
         <div className="chart-scroll">
-          <AreaChart points={points} format={(v) => usd(BigInt(Math.round(v)), decimals)} />
+          <AreaChart
+            points={points}
+            format={(v) => usd(BigInt(Math.round(v)), decimals)}
+            label="Value of sukuk held over time"
+          />
         </div>
         <p className="muted small">
           The chart tracks sukuk holdings at par, from indexed transactions; the figure above also counts test dollars.

@@ -27,6 +27,6 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  // The landing and app workspaces are browser code with their own tsconfig.
-  "exclude": ["node_modules", "apps/landing", "apps/app"]
+  // The landing, app and docs workspaces are browser code with their own tsconfig.
+  "exclude": ["node_modules", "apps/landing", "apps/app", "apps/docs"]
 }
